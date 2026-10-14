@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="nl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XBTC RWA Exchange & Mining Vault | XBTC.LLC & Shin Art Ltd</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vault: {
+                            900: '#07090e',
+                            800: '#0d111a',
+                            700: '#161c2b',
+                            600: '#212a3e',
+                        },
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                        },
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+        body {
+            background-color: #07090e;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(16, 185, 129, 0.04) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.8) 0px, transparent 100%);
+            background-attachment: fixed;
+        }
+
+        .glass-panel {
+            background: rgba(13, 17, 26, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-panel-glow {
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.12), inset 0 0 15px rgba(245, 158, 11, 0.05);
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fffbeb 0%, #f59e0b 50%, #b45309 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-border-gradient {
+            border-image: linear-gradient(to right, #f59e0b, #78350f) 1;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07090e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+
+        .pulse-emerald {
+            animation: pulse-emerald-anim 2s infinite;
+        }
+
+        @keyframes pulse-emerald-anim {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Certificate stamp styling */
+        .wax-seal {
+            background: radial-gradient(circle, #f59e0b 0%, #b45309 70%, #78350f 100%);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-slate-100 antialiased selection:bg-gold-500 selection:text-black">
+
+    <header class="sticky top-0 z-40 border-b border-gold-500/20 bg-vault-900/90 backdrop-blur-md">
+        <!-- Custodian & Supply Ticker Bar -->
+        <div class="bg-vault-800/90 border-b border-slate-800/80 px-4 py-1.5 text-xs">
+            <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+                <div class="flex items-center space-x-3 text-slate-300">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-gold-500/10 text-gold-400 border border-gold-500/30">
+                        <i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> OFFICIËLE BEHEERDERS
+                    </span>
+                    <span class="font-medium text-amber-200">XBTC.LLC & Shin Art Ltd</span>
+                    <span class="text-slate-600">|</span>
+                    <span class="hidden md:inline text-slate-400">Juridische Borgstelling Real World Assets</span>
+                </div>
+                <div class="flex items-center space-x-4 text-xs font-mono">
+                    <div class="flex items-center text-slate-300">
+                        <span class="text-slate-500 mr-1">RWA Borg Pool:</span>
+                        <span class="text-gold-400 font-bold">10.000.000.000 XBTC</span>
+                    </div>
+                    <div class="hidden sm:flex items-center text-emerald-400">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5 pulse-emerald"></span>
+                        <span class="text-slate-400 mr-1">Systeem Status:</span> ACTIEF
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Navigation Bar -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('market')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gold-600 via-amber-500 to-yellow-300 p-0.5 shadow-lg shadow-gold-500/20 flex items-center justify-center">
+                        <div class="w-full h-full bg-vault-900 rounded-[10px] flex items-center justify-center">
+                            <i data-lucide="coins" class="w-5 h-5 text-gold-400"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg font-extrabold tracking-tight text-white">XBTC</span>
+                            <span class="text-xs px-1.5 py-0.5 rounded font-mono bg-gold-500/20 text-gold-400 border border-gold-500/40">RWA VAULT</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 tracking-wider uppercase font-medium">Fine Art & Rare Antiques Exchange</p>
+                    </div>
+                </div>
+
+                <!-- Nav Links (Desktop) -->
+                <nav class="hidden lg:flex items-center space-x-1 bg-vault-800/60 p-1 rounded-xl border border-slate-800">
+                    <button onclick="switchTab('market')" id="nav-market" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 text-gold-400 bg-gold-500/10 border border-gold-500/30">
+                        <i data-lucide="landmark" class="w-4 h-4"></i>
+                        <span>RWA Marktplaats</span>
+                    </button>
+                    <button onclick="switchTab('mining')" id="nav-mining" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <i data-lucide="cpu" class="w-4 h-4"></i>
+                        <span>Auto-Rewards Miner</span>
+                        <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LIVE</span>
+                    </button>
+                    <button onclick="switchTab('wallet')" id="nav-wallet" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <i data-lucide="wallet" class="w-4 h-4"></i>
+                        <span>Wallet & DEX Swap</span>
+                    </button>
+                    <button onclick="switchTab('deeds')" id="nav-deeds" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <i data-lucide="file-check" class="w-4 h-4"></i>
+                        <span>Eigendomsaktes</span>
+                        <span id="badge-deeds-count" class="bg-gold-500 text-vault-900 font-bold rounded-full w-4 h-4 text-[10px] flex items-center justify-center">1</span>
+                    </button>
+                    <button onclick="switchTab('protocol')" id="nav-protocol" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <i data-lucide="scale" class="w-4 h-4"></i>
+                        <span>Valutatie Protocol</span>
+                    </button>
+                </nav>
+
+                <!-- Quick Balance Widget -->
+                <div class="flex items-center space-x-3">
+                    <div class="glass-panel px-3 py-1.5 rounded-xl border border-gold-500/30 flex items-center space-x-3 cursor-pointer" onclick="switchTab('wallet')">
+                        <div class="w-8 h-8 rounded-lg bg-gold-500/20 flex items-center justify-center text-gold-400 font-bold">
+                            X
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-400 uppercase font-mono">XBTC Saldo</div>
+                            <div class="text-sm font-bold font-mono text-gold-400" id="header-xbtc-balance">125.450 XBTC</div>
+                        </div>
+                    </div>
+
+                    <!-- Sound Toggle Button -->
+                    <button id="sound-toggle-btn" onclick="toggleAudio()" class="p-2 rounded-xl bg-vault-800 border border-slate-700 text-slate-400 hover:text-gold-400 transition" title="Geluid Effecten Schakelen">
+                        <i data-lucide="volume-2" id="sound-icon" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Tabs -->
+        <div class="lg:hidden flex overflow-x-auto border-t border-slate-800 bg-vault-900 px-2 py-2 space-x-2">
+            <button onclick="switchTab('market')" id="mob-nav-market" class="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap bg-gold-500/20 text-gold-400 border border-gold-500/30">
+                Marktplaats
+            </button>
+            <button onclick="switchTab('mining')" id="mob-nav-mining" class="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap text-slate-400 bg-vault-800">
+                Auto Miner
+            </button>
+            <button onclick="switchTab('wallet')" id="mob-nav-wallet" class="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap text-slate-400 bg-vault-800">
+                Wallet & DEX
+            </button>
+            <button onclick="switchTab('deeds')" id="mob-nav-deeds" class="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap text-slate-400 bg-vault-800">
+                Mijn Aktes
+            </button>
+            <button onclick="switchTab('protocol')" id="mob-nav-protocol" class="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap text-slate-400 bg-vault-800">
+                Protocol
+            </button>
+        </div>
+    </header>
+
+    <div class="bg-vault-900/80 border-b border-slate-800/60 overflow-hidden py-2 font-mono text-xs">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between overflow-x-auto space-x-6 text-slate-300 whitespace-nowrap">
+            <div class="flex items-center space-x-2">
+                <span class="text-slate-500">MARKET INDEX:</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-slate-400">BTC/USD:</span>
+                <span class="font-bold text-white" id="ticker-btc-price">$94,250.00</span>
+                <span class="text-emerald-400 text-[11px]" id="ticker-btc-change">+2.4%</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-slate-400">ETH/USD:</span>
+                <span class="font-bold text-white" id="ticker-eth-price">$3,480.50</span>
+                <span class="text-emerald-400 text-[11px]" id="ticker-eth-change">+3.1%</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-slate-400">DOGE/USD:</span>
+                <span class="font-bold text-white" id="ticker-doge-price">$0.185</span>
+                <span class="text-emerald-400 text-[11px]" id="ticker-doge-change">+5.8%</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-slate-400">XRP/USD:</span>
+                <span class="font-bold text-white" id="ticker-xrp-price">$1.12</span>
+                <span class="text-rose-400 text-[11px]" id="ticker-xrp-change">-0.4%</span>
+            </div>
+            <div class="flex items-center space-x-2 border-l border-slate-700 pl-4">
+                <span class="text-amber-400 font-bold">1 XBTC RATE:</span>
+                <span class="text-gold-400 font-bold" id="ticker-xbtc-rate">$1.00 USD</span>
+                <span class="text-slate-500">(100 Sats)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+
+
+        <!-- =================================================================== -->
+        <!-- TAB 1: RWA MARKETPLACE (MARKTPLAATS) -->
+        <!-- =================================================================== -->
+        <section id="tab-market" class="tab-content">
+
+
+            <!-- Hero Banner & Filter bar -->
+            <div class="glass-panel rounded-2xl p-6 sm:p-8 mb-8 relative overflow-hidden border border-gold-500/30">
+                <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="md:flex items-center justify-between relative z-10">
+                    <div class="max-w-2xl">
+                        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-gold-500/10 text-gold-400 text-xs font-semibold mb-3 border border-gold-500/20">
+                            <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                            <span>Shine Art Ltd · Eigen activa aanmelden</span>
+                        </div>
+                        <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">
+                            Uw <span class="gold-gradient-text">Real World Assets</span> Exchange
+                        </h1>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                            Exclusieve schilderijen en zeldzaam antiek. Gebruikers melden eigen werken aan. Deze blijven bij de verkoper tot afwikkeling. Eigendom, authenticiteit en levering worden afzonderlijk beoordeeld. Het collectiedoel bedraagt 10 miljard XBTC; dit is geen geverifieerde reserve.
+                        </p>
+                    </div>
+
+                    <!-- Market Stats Brief -->
+                    <div class="mt-6 md:mt-0 grid grid-cols-2 gap-3 min-w-[260px]">
+                        <div class="bg-vault-900/80 p-3 rounded-xl border border-slate-800 text-center">
+                            <div class="text-[10px] text-slate-400 uppercase font-mono">Totale Waarde Vault</div>
+                            <div class="text-lg font-bold text-gold-400">Nog niet vastgesteld</div>
+                        </div>
+                        <div class="bg-vault-900/80 p-3 rounded-xl border border-slate-800 text-center">
+                            <div class="text-[10px] text-slate-400 uppercase font-mono">Gevalideerde Activa</div>
+                            <div class="text-lg font-bold text-emerald-400"><span id="verified-assets-count">0</span> Objecten</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Category Filters -->
+                <div class="mt-8 pt-6 border-t border-slate-800/80 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+                        <button onclick="filterMarket('all')" id="filter-all" class="filter-btn px-4 py-2 rounded-lg text-xs font-medium bg-gold-500 text-vault-900 font-bold transition">Alle Activa</button>
+                        <button onclick="filterMarket('painting')" id="filter-painting" class="filter-btn px-4 py-2 rounded-lg text-xs font-medium bg-vault-800 text-slate-300 hover:text-white transition">Schilderijen</button>
+                        <button onclick="filterMarket('antique')" id="filter-antique" class="filter-btn px-4 py-2 rounded-lg text-xs font-medium bg-vault-800 text-slate-300 hover:text-white transition">Antiek & Meubilair</button>
+                        <button onclick="filterMarket('sculpture')" id="filter-sculpture" class="filter-btn px-4 py-2 rounded-lg text-xs font-medium bg-vault-800 text-slate-300 hover:text-white transition">Sculpturen</button>
+                        <button onclick="filterMarket('rare')" id="filter-rare" class="filter-btn px-4 py-2 rounded-lg text-xs font-medium bg-vault-800 text-slate-300 hover:text-white transition">Zeldzaam Porselein</button>
+                    </div>
+
+                    <div class="relative w-full md:w-72">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="market-search" onkeyup="searchMarket()" placeholder="Zoek op titel, ref nr of meester..." class="w-full bg-vault-900/90 border border-slate-700 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:border-gold-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assets Grid -->
+            <div id="assets-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamic cards populated by JavaScript -->
+            </div>
+<section class="glass-panel rounded-2xl p-6 mb-8" aria-labelledby="verification-heading">
+ <h2 id="verification-heading" class="text-xl font-bold text-gold-400">Eigenaarverificatie & biedingen</h2>
+ <p class="text-sm mt-2">Prototype · voorbeeldsaldi, prijzen, mining en swaps zijn simulaties. Geen automatische betalingsverificatie, identiteitscontrole of juridische goedkeuring.</p>
+ <p class="text-sm mt-2">Nieuwe inzendingen: <strong>Eigenaarverificatie in behandeling</strong>. Bieden blijft geblokkeerd tot eigenaar, eigendom, authenticiteit, conditie en levering onafhankelijk zijn goedgekeurd. Werken blijven bij de verkoper tot afwikkeling.</p>
+ <p class="text-sm mt-2">Betaling uitsluitend bij definitieve afwikkeling. Biedingen reserveren of innen geen tokens. Bij afsluiting moeten beschikbare middelen opnieuw worden gecontroleerd; een bod is geen betalingsbewijs.</p>
+ <details open class="mt-4"><summary class="cursor-pointer text-gold-400">Uw eigen asset aanbieden op XBTC</summary>
+ <p class="text-xs mt-2">Meld uitsluitend een bestaand asset aan dat u bevoegd bent te verkopen. Voeg een eigen foto en bewijsreferenties toe. Geen identiteitsdocumenten uploaden. De inzending blijft lokaal in deze browser; er is nog geen gedeelde exchange of verificatiedienst.</p>
+ <form id="owner-submission" class="grid sm:grid-cols-2 gap-3 mt-4">
+ <label>Titel<input required maxlength="160" name="title" class="block w-full bg-slate-800 p-2 rounded"></label>
+ <label>Naam eigenaar / rechtspersoon<input required maxlength="160" name="owner" class="block w-full bg-slate-800 p-2 rounded"></label>
+ <label>Land waar het werk zich bevindt<input required maxlength="100" name="country" class="block w-full bg-slate-800 p-2 rounded"></label>
+ <label>Referentie eigendomsbewijs<input required maxlength="200" name="ownership" class="block w-full bg-slate-800 p-2 rounded"></label>
+ <label>Referentie herkomst / provenance<input required maxlength="200" name="provenance" class="block w-full bg-slate-800 p-2 rounded"></label>
+ <label>Eigen foto<input required type="file" name="photo" accept="image/jpeg,image/png,image/webp" class="block w-full bg-slate-800 p-2 rounded"></label>
+ <label>Assetcategorie<select name="category" class="block w-full bg-slate-800 p-2 rounded"><option value="painting">Schilderij</option><option value="antique">Antiek</option><option value="sculpture">Sculptuur</option><option value="rare">Ander verzamelobject</option></select></label>
+ <label>Startbod XBTC (hele tokens)<input required type="number" name="price" min="1" max="10000000000" step="1" class="block w-full bg-slate-800 p-2 rounded"></label>
+ <label class="sm:col-span-2"><input required type="checkbox" name="authority"> Ik verklaar bevoegd te zijn om dit werk te verkopen. Deze verklaring is nog geen verificatie.</label>
+ <button class="bg-gold-500 text-black p-3 rounded font-bold" type="submit">Indienen voor beoordeling</button>
+ </form></details>
+ <p id="verification-storage" class="text-xs mt-3" role="status"></p>
+ <p id="bid-summary" class="text-sm mt-3" aria-live="polite"></p>
+ <div class="mt-3 flex gap-3"><button type="button" onclick="exportVerificationRecords()" class="bg-slate-800 p-2 rounded">Download auditlog voor Excel (CSV)</button></div>
+ <p class="text-xs mt-3">Collectiedoel: 10.000.000.000 XBTC in geldige winnende biedingen, elk token eenmaal. Daarna: biedpauze en tweede controle binnen twee minuten. Alleen geslaagde controles mogen afwikkeling toestaan. Dit prototype sluit niet automatisch af.</p>
+</section>
+        </section>
+
+        <section class="glass-panel rounded-2xl p-6 mb-8" aria-labelledby="paypal-heading">
+            <h2 id="paypal-heading" class="text-xl font-bold text-gold-400">PayPal · Shine Art Ltd</h2>
+            <p class="text-sm mt-2">Opgegeven ontvanger: <strong>@alvineeckels002</strong></p>
+            <p class="text-sm mt-2 text-amber-300">Ontvanger nog niet onafhankelijk geverifieerd. Controleer de naam op PayPal voordat je betaalt.</p>
+            <a id="paypal-recipient-link" href="https://paypal.me/alvineeckels002" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 px-5 py-3 rounded-xl bg-gold-500 text-vault-900 font-bold">Open PayPal · controleer ontvanger</a>
+            <p class="text-xs mt-3 text-slate-400">Dit opent alleen het PayPal-profiel. De app bevestigt geen betaling en kent geen XBTC of eigendom toe. Betaling voor een kunstwerk uitsluitend bij definitieve afwikkeling; biedingen blijven onbetaald. XBTC-aankopen wachten op een geverifieerde bestelling, betalingsbevestiging en on-chain levering.</p>
+        </section>
+        <!-- =================================================================== -->
+        <!-- TAB 2: MINING APPLICATION (AUTO-REWARDS) -->
+        <!-- =================================================================== -->
+        <section id="tab-mining" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Mining Control Center -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="glass-panel rounded-2xl p-6 border border-gold-500/30">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <span class="px-2.5 py-1 rounded text-xs font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GEINTEGREERDE AUTO-REWARDS ENGINE</span>
+                                <h2 class="text-2xl font-bold text-white mt-2">XBTC Multi-Proof Mining Node</h2>
+                                <p class="text-xs text-slate-400 mt-1">
+                                    Mined automatisch XBTC tokens door rekenkracht te koppelen aan de actuele marktwaarden van <span class="text-amber-300 font-medium">Bitcoin (BTC)</span>, <span class="text-sky-300 font-medium">Ethereum (ETH)</span> en <span class="text-yellow-400 font-medium">Dogecoin (DOGE)</span>.
+                                </p>
+                            </div>
+
+                            <div class="text-right">
+                                <div class="text-[10px] text-slate-400 font-mono uppercase">Node Status</div>
+                                <div id="mining-status-pill" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700 mt-1">
+                                    <span class="w-2 h-2 rounded-full bg-slate-500 mr-2" id="mining-status-dot"></span>
+                                    <span id="mining-status-text">OFFLINE</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mining Dashboard Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-vault-900/90 p-4 rounded-xl border border-slate-800">
+                                <div class="text-xs text-slate-400 flex items-center justify-between">
+                                    <span>Hashrate</span>
+                                    <i data-lucide="activity" class="w-3.5 h-3.5 text-gold-400"></i>
+                                </div>
+                                <div class="text-xl font-bold font-mono text-gold-400 mt-1" id="current-hashrate">0 MH/s</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">Instelbaar vermogen</div>
+                            </div>
+
+                            <div class="bg-vault-900/90 p-4 rounded-xl border border-slate-800">
+                                <div class="text-xs text-slate-400 flex items-center justify-between">
+                                    <span>Mined XBTC</span>
+                                    <i data-lucide="database" class="w-3.5 h-3.5 text-emerald-400"></i>
+                                </div>
+                                <div class="text-xl font-bold font-mono text-emerald-400 mt-1" id="mined-xbtc-session">0.0000 XBTC</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">Deze sessie opgebouwd</div>
+                            </div>
+
+                            <div class="bg-vault-900/90 p-4 rounded-xl border border-slate-800">
+                                <div class="text-xs text-slate-400 flex items-center justify-between">
+                                    <span>Reward Factor</span>
+                                    <i data-lucide="trending-up" class="w-3.5 h-3.5 text-sky-400"></i>
+                                </div>
+                                <div class="text-xl font-bold font-mono text-sky-400 mt-1" id="mining-multiplier">1.84x</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">BTC + ETH + DOGE Gewogen</div>
+                            </div>
+
+                            <div class="bg-vault-900/90 p-4 rounded-xl border border-slate-800">
+                                <div class="text-xs text-slate-400 flex items-center justify-between">
+                                    <span>Gekoppelde Sats</span>
+                                    <i data-lucide="zap" class="w-3.5 h-3.5 text-yellow-400"></i>
+                                </div>
+                                <div class="text-xl font-bold font-mono text-yellow-400 mt-1" id="mined-sats-session">0 Sats</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">Auto-conversie reserve</div>
+                            </div>
+                        </div>
+
+                        <!-- Mining Controls -->
+                        <div class="bg-vault-900/60 p-5 rounded-xl border border-slate-800/80 space-y-4">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label for="hashrate-slider" class="text-xs font-semibold text-slate-300">Hashrate Vermogen Toewijzen (MH/s):</label>
+                                    <span class="text-sm font-bold font-mono text-gold-400" id="slider-value-display">120 MH/s</span>
+                                </div>
+                                <input type="range" id="hashrate-slider" min="10" max="500" value="120" oninput="updateHashrateSlider(this.value)" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-gold-500">
+                                <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                                    <span>10 MH/s (Eco Mode)</span>
+                                    <span>250 MH/s (Balanced)</span>
+                                    <span>500 MH/s (Turbo RWA Node)</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-4 pt-2">
+                                <button id="btn-toggle-miner" onclick="toggleMiner()" class="flex-1 py-3 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-vault-900 shadow-lg shadow-emerald-500/20 transition flex items-center justify-center space-x-2">
+                                    <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                                    <span>START MINER ENGINE</span>
+                                </button>
+                                <button onclick="clearMinerLog()" class="px-4 py-3 bg-vault-800 text-slate-300 hover:text-white rounded-xl text-xs font-mono border border-slate-700">
+                                    Clear Log
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Chart Section -->
+                        <div class="mt-6">
+                            <h3 class="text-xs font-mono text-slate-400 uppercase tracking-wider mb-3">Live XBTC Opbrengst Curve (Sessie)</h3>
+                            <div class="bg-vault-900/80 p-4 rounded-xl border border-slate-800 h-64">
+                                <canvas id="miningChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mining Terminal & Auto-Reward Index -->
+                <div class="space-y-6">
+                    <!-- Realtime Earning Log Terminal -->
+                    <div class="glass-panel rounded-2xl p-5 border border-gold-500/30 flex flex-col h-[400px]">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="terminal" class="w-4 h-4 text-emerald-400"></i>
+                                <h3 class="text-xs font-bold font-mono text-white">MINING TERMINAL LOG</h3>
+                            </div>
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        </div>
+                        <div id="mining-log-container" class="mt-3 font-mono text-[11px] text-slate-300 space-y-1.5 overflow-y-auto flex-grow pr-1">
+                            <div class="text-slate-500">[SYSTEM] Mining engine initialized. Waiting for user start command...</div>
+                        </div>
+                    </div>
+
+                    <!-- Auto-Reward Index Info Box -->
+                    <div class="glass-panel rounded-2xl p-5 border border-slate-800">
+                        <h3 class="text-sm font-bold text-amber-300 mb-2 flex items-center">
+                            <i data-lucide="cpu" class="w-4 h-4 mr-2 text-gold-400"></i>
+                            Auto-Reward Formule Protocol
+                        </h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            De beloning in <span class="text-gold-400 font-mono">XBTC</span> wordt dynamisch berekend volgens de gecombineerde formule:
+                        </p>
+                        <div class="bg-vault-900/90 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-emerald-400 my-3">
+                            Reward = (Hashrate × Time) × [(0.5 × BTC) + (0.3 × ETH) + (0.2 × DOGE)] / Index_Divider
+                        </div>
+                        <p class="text-xs text-slate-400">
+                            Verdiende XBTC wordt direct bijgeschreven op uw geïntegreerde wallet en is per direct inzetbaar als onderpand op de RWA Marktplaats.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- TAB 3: INTEGRATED WALLET & DEX SWAP -->
+        <!-- =================================================================== -->
+        <section id="tab-wallet" class="tab-content hidden">
+ <div class="glass-panel rounded-2xl p-6 mb-6">
+  <h2 class="text-xl font-bold text-gold-400">Mijn echte assets · veiling en eigendom</h2>
+  <p class="text-sm mt-2">Veiling gesloten → winnend asset in afwachting → betaling en eigendom gecontroleerd → definitief eigendomsbewijs / token in uw wallet. Sluiting alleen draagt geen eigendom over.</p>
+  <p class="text-xs mt-2 text-amber-300">Automatische veilingafsluiting, betalingscontrole en on-chain levering zijn nog niet aangesloten.</p>
+  <div id="real-wallet-assets" class="mt-4 space-y-3"></div>
+ </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Wallet Balances Overview -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="glass-panel rounded-2xl p-6 border border-gold-500/30">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <span class="px-2.5 py-1 rounded text-xs font-mono bg-gold-500/10 text-gold-400 border border-gold-500/30">GEINTEGREERDE MULTI-CRYPTO WALLET</span>
+                                <h2 class="text-2xl font-bold text-white mt-1">XBTC Kluis Saldo's</h2>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-slate-400">Totale geschatte waarde:</div>
+                                <div class="text-xl font-bold text-gold-400 font-mono" id="wallet-total-usd">$125,840.00 USD</div>
+                            </div>
+                        </div>
+
+                        <!-- Asset Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="wallet-cards-grid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Multi-Currency Conversion Utility App -->
+                    <div class="glass-panel rounded-2xl p-6 border border-slate-800">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="p-2 rounded-lg bg-gold-500/20 text-gold-400">
+                                <i data-lucide="calculator" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-white">Conversie Utility App</h3>
+                                <p class="text-xs text-slate-400">Direct omrekenen naar mBTC, Sats, BTC, ETH, DOGE & XRP</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-vault-900/80 p-4 rounded-xl border border-slate-800">
+                            <div>
+                                <label class="text-[11px] text-slate-400 block mb-1 font-mono">Invoer Aantal XBTC:</label>
+                                <input type="number" id="calc-input-xbtc" value="1000" oninput="runConverterApp()" class="w-full bg-vault-800 border border-slate-700 rounded-lg p-2.5 text-sm font-mono text-gold-400 focus:outline-none focus:border-gold-500">
+                            </div>
+                            <div class="sm:col-span-2 grid grid-cols-2 gap-3 text-xs font-mono">
+                                <div class="bg-vault-800/80 p-2.5 rounded-lg border border-slate-700/60">
+                                    <div class="text-slate-500 text-[10px]">In Satoshis (Sats):</div>
+                                    <div class="text-yellow-400 font-bold text-sm mt-0.5" id="calc-res-sats">100,000 Sats</div>
+                                </div>
+                                <div class="bg-vault-800/80 p-2.5 rounded-lg border border-slate-700/60">
+                                    <div class="text-slate-500 text-[10px]">In milliBitcoin (mBTC):</div>
+                                    <div class="text-amber-300 font-bold text-sm mt-0.5" id="calc-res-mbtc">1.00 mBTC</div>
+                                </div>
+                                <div class="bg-vault-800/80 p-2.5 rounded-lg border border-slate-700/60">
+                                    <div class="text-slate-500 text-[10px]">In Bitcoin (BTC):</div>
+                                    <div class="text-orange-400 font-bold text-sm mt-0.5" id="calc-res-btc">0.001060 BTC</div>
+                                </div>
+                                <div class="bg-vault-800/80 p-2.5 rounded-lg border border-slate-700/60">
+                                    <div class="text-slate-500 text-[10px]">In Ethereum (ETH):</div>
+                                    <div class="text-sky-300 font-bold text-sm mt-0.5" id="calc-res-eth">0.2873 ETH</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instant DEX Swap Module -->
+                <div class="space-y-6">
+                    <div class="glass-panel rounded-2xl p-6 border border-gold-500/30">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-base font-bold text-white flex items-center">
+                                <i data-lucide="repeat" class="w-4 h-4 mr-2 text-gold-400"></i>
+                                Instant DEX Swap
+                            </h3>
+                            <span class="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">0% Protocol Fee</span>
+                        </div>
+
+                        <!-- From Currency -->
+                        <div class="bg-vault-900/90 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between text-xs text-slate-400 mb-1">
+                                <span>Van:</span>
+                                <span>Saldo: <span id="swap-from-max" class="text-gold-400 font-mono cursor-pointer" onclick="setSwapMax()">125.450</span></span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="number" id="swap-from-amount" value="5000" oninput="calculateSwap()" placeholder="0.0" class="w-full bg-transparent text-xl font-bold font-mono text-white focus:outline-none">
+                                <select id="swap-from-select" onchange="calculateSwap()" class="bg-vault-800 border border-slate-700 text-xs font-bold rounded-lg p-2 text-gold-400 focus:outline-none">
+                                    <option value="XBTC">XBTC</option>
+                                    <option value="BTC">BTC</option>
+                                    <option value="ETH">ETH</option>
+                                    <option value="DOGE">DOGE</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Swap Direction Arrow -->
+                        <div class="flex justify-center -my-2 relative z-10">
+                            <button onclick="invertSwap()" class="p-2 rounded-full bg-gold-500 text-vault-900 shadow-lg hover:scale-110 transition">
+                                <i data-lucide="arrow-down-up" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <!-- To Currency -->
+                        <div class="bg-vault-900/90 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between text-xs text-slate-400 mb-1">
+                                <span>Naar (Geschat):</span>
+                                <span>Koers: <span id="swap-rate-display" class="text-slate-300 font-mono">1 XBTC = 100 Sats</span></span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="text" id="swap-to-amount" readonly value="500,000" class="w-full bg-transparent text-xl font-bold font-mono text-emerald-400 focus:outline-none">
+                                <select id="swap-to-select" onchange="calculateSwap()" class="bg-vault-800 border border-slate-700 text-xs font-bold rounded-lg p-2 text-slate-200 focus:outline-none">
+                                    <option value="SATS">Sats</option>
+                                    <option value="mBTC">mBTC</option>
+                                    <option value="BTC">BTC</option>
+                                    <option value="ETH">ETH</option>
+                                    <option value="DOGE">DOGE</option>
+                                    <option value="XRP">XRP</option>
+                                    <option value="XBTC">XBTC</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button onclick="executeSwap()" class="w-full mt-5 py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-400 hover:to-amber-500 text-vault-900 shadow-lg shadow-gold-500/20 transition flex items-center justify-center space-x-2">
+                            <i data-lucide="arrow-right-left" class="w-4 h-4"></i>
+                            <span>BEVESTIG RUIL TRANSACTIE</span>
+                        </button>
+                    </div>
+
+                    <!-- Swap History Log -->
+                    <div class="glass-panel rounded-2xl p-5 border border-slate-800">
+                        <h4 class="text-xs font-bold font-mono text-slate-400 uppercase mb-3">Laatste DEX Conversies</h4>
+                        <div id="swap-history-list" class="space-y-2 text-xs font-mono">
+                            <div class="p-2 rounded bg-vault-900/60 border border-slate-800 flex justify-between">
+                                <span class="text-slate-400">1.000 XBTC → 100.000 Sats</span>
+                                <span class="text-emerald-400">Succes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- TAB 4: EIGENDOMSAKTES (OWNERSHIP TITLE DEEDS) -->
+        <!-- =================================================================== -->
+        <section id="tab-deeds" class="tab-content hidden">
+            <div class="glass-panel rounded-2xl p-6 sm:p-8 mb-8 border border-gold-500/30">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-6 mb-6">
+                    <div>
+                        <span class="px-2.5 py-1 rounded text-xs font-mono bg-gold-500/10 text-gold-400 border border-gold-500/30">DIGITAAL EIGENDOMSREGISTER</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">Mijn Gevalideerde Eigendomsaktes</h2>
+                        <p class="text-xs sm:text-sm text-slate-300 mt-1">
+                            Officieel geregistreerde Real World Assets onder beheer van <span class="text-amber-300">XBTC.LLC & Shin Art Ltd</span>.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button onclick="switchTab('market')" class="px-4 py-2 bg-gold-500/20 text-gold-400 hover:bg-gold-500/30 rounded-xl text-xs font-bold border border-gold-500/40 transition flex items-center space-x-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Nieuw Object Borg Staan</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="deeds-container-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Dynamic Title Deeds Cards will render here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- TAB 5: PROTOCOL & VALUATION MATRIX INFO -->
+        <!-- =================================================================== -->
+        <section id="tab-protocol" class="tab-content hidden">
+            <div class="max-w-4xl mx-auto space-y-8">
+                <div class="glass-panel rounded-2xl p-8 border border-gold-500/30 text-center relative overflow-hidden">
+                    <div class="w-16 h-16 rounded-2xl bg-gold-500/20 text-gold-400 mx-auto flex items-center justify-center mb-4 border border-gold-500/40">
+                        <i data-lucide="scale" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-white">XBTC RWA Valutatie & Borgstelling Protocol</h2>
+                    <p class="text-slate-300 text-sm mt-2 max-w-2xl mx-auto">
+                        Een gestructureerd juridisch en cryptografisch raamwerk ontwikkeld door <span class="text-gold-400 font-bold">XBTC.LLC & Shin Art Ltd</span> ter ondersteuning van $10 Miljard aan tokenized fysieke kunst en antiek.
+                    </p>
+                </div>
+
+                <!-- 4 Criteria Matrix Standard -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                        <div class="flex items-center space-x-3 mb-3 text-gold-400">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                            <h3 class="text-base font-bold">1. Originaliteit & Echtheid</h3>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Röntgenanalyse, pigment-spectrometrie en certificering door onafhankelijke kunsthistorici garanderen een echtheidsscore van 95% tot 100%. Unieke cryptografische hashes worden in de actte verankerd.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                        <div class="flex items-center space-x-3 mb-3 text-amber-400">
+                            <i data-lucide="history" class="w-6 h-6"></i>
+                            <h3 class="text-base font-bold">2. Status in de Maatschappij / Herkomst</h3>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Evaluatie van tentoonstellingshistorie, museale bruiklenen, historische provenance en maatschappelijke impact. Bekende meesterwerken ontvangen een A+ herkomst status.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                        <div class="flex items-center space-x-3 mb-3 text-emerald-400">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                            <h3 class="text-base font-bold">3. Huidige Toestand & Restauratie</h3>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Fysieke inspecties door Shin Art Ltd conservatoren. Beoordeling van doekspanning, vernislaag, houtskelet en restauratiehistorie met een classificatie van A+ (Museumstaat) tot B.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                        <div class="flex items-center space-x-3 mb-3 text-sky-400">
+                            <i data-lucide="layers" class="w-6 h-6"></i>
+                            <h3 class="text-base font-bold">4. Aantal / Zeldzaamheid</h3>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Aantal bekende exemplaren wereldwijd (bv. Unicaat 1/1, gelimiteerde sets van 4 stoelen). Zeldzaamheid bepaalt de liquiditeitsmultiplier van de XBTC borg.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Custodial Assurance Banner -->
+                <div class="bg-vault-800/90 p-6 rounded-2xl border border-gold-500/30 flex items-start space-x-4">
+                    <div class="p-3 bg-gold-500/20 text-gold-400 rounded-xl">
+                        <i data-lucide="lock" class="w-6 h-6"></i>
+                    </div>
+                    <div class="text-xs text-slate-300 space-y-2">
+                        <h4 class="text-sm font-bold text-white">Kluis & Fysieke Opeising Garantie</h4>
+                        <p>
+                            Alle fysieke stukken blijven in de zwaar beveiligde douanekluizen (Freeports Zurich, Genève, Amsterdam) onder de juridische entiteiten <strong class="text-gold-400">XBTC.LLC & Shin Art Ltd</strong>.
+                        </p>
+                        <p>
+                            Houders van de benodigde hoeveelheid XBTC kunnen op elk moment via het platform de fysieke levering opeisen. Bij opeising wordt de corresponderende XBTC uit de circulatie genomen (burned/locked) en wordt de Eigendomsakte formeel overgedragen.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 1: ASSET DETAIL & REDEMPTION MODAL -->
+    <div id="modal-asset-detail" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+        <div class="glass-panel w-full max-w-3xl rounded-2xl border border-gold-500/40 overflow-hidden shadow-2xl max-h-[90vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-vault-800 border-b border-slate-800 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-gold-500/20 text-gold-400 border border-gold-500/30" id="modal-ref-nr">REF-RWA-00000</span>
+                    <h3 class="text-base font-bold text-white" id="modal-title">Asset Title</h3>
+                </div>
+                <button onclick="closeModal('modal-asset-detail')" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (Scrollable) -->
+            <div class="p-6 space-y-6 overflow-y-auto flex-grow text-xs text-slate-300">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Visual Mock -->
+                    <div class="space-y-3">
+                        <div class="relative h-64 rounded-xl overflow-hidden bg-vault-900 border border-slate-800 flex items-center justify-center p-4 text-center">
+                            <img id="modal-img" src="" alt="Asset Image" class="max-h-full max-w-full object-contain rounded-lg">
+                            <div class="absolute top-2 left-2 px-2 py-1 bg-vault-900/90 text-gold-400 text-[10px] font-mono rounded border border-gold-500/30" id="modal-category">
+                                Category
+                            </div>
+                        </div>
+                        <div class="bg-vault-900/80 p-3 rounded-xl border border-slate-800 text-center">
+                            <div class="text-slate-500 text-[10px]">Geschatte Marktwaarde</div>
+                            <div class="text-lg font-extrabold text-gold-400 font-mono" id="modal-val-usd">$0 USD</div>
+                            <div class="text-xs text-amber-300 font-mono font-bold mt-0.5" id="modal-val-xbtc">0 XBTC</div>
+                        </div>
+                    </div>
+
+                    <!-- Valuation Criteria Matrix -->
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-bold text-amber-300 uppercase font-mono tracking-wider">Officieel Valutatie Report Matrix</h4>
+                        
+                        <div class="space-y-2 font-mono">
+                            <div class="bg-vault-900/90 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
+                                <span class="text-slate-400">Originaliteit & Echtheid:</span>
+                                <span class="text-emerald-400 font-bold" id="modal-score-orig">99.4%</span>
+                            </div>
+
+                            <div class="bg-vault-900/90 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
+                                <span class="text-slate-400">Status / Herkomst:</span>
+                                <span class="text-gold-400 font-bold" id="modal-score-status">A+ Koninklijk</span>
+                            </div>
+
+                            <div class="bg-vault-900/90 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
+                                <span class="text-slate-400">Huidige Toestand:</span>
+                                <span class="text-sky-400 font-bold" id="modal-score-conditie">A+ Uitstekend</span>
+                            </div>
+
+                            <div class="bg-vault-900/90 p-2.5 rounded-lg border border-slate-800 flex justify-between items-center">
+                                <span class="text-slate-400">Aantal / Zeldzaamheid:</span>
+                                <span class="text-purple-400 font-bold" id="modal-score-rarity">Unicaat 1/1</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-vault-900/60 p-3 rounded-xl border border-slate-800/80">
+                            <div class="text-slate-400 text-[11px] font-semibold mb-1">Beschrijving & Historie:</div>
+                            <p class="text-[11px] text-slate-300 leading-relaxed" id="modal-desc">
+                                Detailed description goes here...
+                            </p>
+                        </div>
+
+                        <div class="p-3 bg-gold-500/10 rounded-xl border border-gold-500/20 text-[10px] text-amber-200">
+                            <i data-lucide="shield" class="w-3.5 h-3.5 inline mr-1 text-gold-400"></i>
+                            <strong>Juridisch Beheer:</strong> Dit object is ondergebracht in douanekluis beheer bij <strong>XBTC.LLC & Shin Art Ltd</strong>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer Controls -->
+            <div class="px-6 py-4 bg-vault-800 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <button onclick="closeModal('modal-asset-detail')" class="w-full sm:w-auto px-4 py-2 bg-vault-900 text-slate-300 hover:text-white rounded-xl font-medium text-xs border border-slate-700">
+                    Sluiten
+                </button>
+                <button id="btn-modal-claim" onclick="claimAssetWithXBTC()" class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-400 hover:to-amber-500 text-vault-900 font-bold rounded-xl text-xs shadow-lg shadow-gold-500/20 transition flex items-center justify-center space-x-2">
+                    <i data-lucide="key" class="w-4 h-4"></i>
+                    <span>OPEISEN / BORGEN MET XBTC</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: EIGENDOMSAKTE DIGITAL CERTIFICATE DISPLAY -->
+    <div id="modal-deed-certificate" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
+        <div class="glass-panel w-full max-w-2xl rounded-2xl border-2 border-gold-500 p-6 sm:p-8 relative overflow-hidden text-slate-200 shadow-2xl">
+            <!-- Background watermark stamp -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
+                <i data-lucide="award" class="w-96 h-96 text-gold-400"></i>
+            </div>
+
+            <div class="border-4 border-double border-gold-500/40 p-6 sm:p-8 rounded-xl bg-vault-900/90 relative z-10">
+                <div class="flex justify-between items-start border-b border-gold-500/30 pb-4 mb-6">
+                    <div>
+                        <div class="text-[10px] font-mono text-gold-400 uppercase tracking-widest">OFFICIEEL EIGENDOMSDOCUMENT</div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold gold-gradient-text tracking-tight mt-1">CERTIFICAAT VAN EIGENDOM</h2>
+                        <p class="text-[10px] text-slate-400">XBTC Real World Asset Protocol & Title Registry</p>
+                    </div>
+                    <div class="wax-seal w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-vault-900 text-xs shadow-lg border border-gold-300">
+                        XBTC
+                    </div>
+                </div>
+
+                <div class="space-y-4 text-xs font-mono">
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-slate-500">Referentie Nummer:</span>
+                        <span class="text-gold-400 font-bold" id="deed-cert-ref">REF-RWA-88492-XBTC</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-slate-500">Object Benaming:</span>
+                        <span class="text-white font-bold" id="deed-cert-title">Schilderij: Hollands Meesterwerk 1642</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-slate-500">Borg Waarde:</span>
+                        <span class="text-emerald-400 font-bold" id="deed-cert-val">120.000 XBTC ($120.000 USD)</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-slate-500">Juridische Beheerders:</span>
+                        <span class="text-amber-300 font-bold">XBTC.LLC & Shin Art Ltd</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-slate-500">Huidige Eigenaar / User:</span>
+                        <span class="text-sky-300 font-bold" id="deed-cert-owner">0x71F...89A2 (U)</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-slate-500">Kluis Locatie:</span>
+                        <span class="text-slate-300">Freeport Vault Alpha, Sector 4B</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-gold-500/30 flex justify-between items-end text-[10px]">
+                    <div>
+                        <div class="text-slate-500">Handtekening Beheerder:</div>
+                        <div class="font-serif italic text-gold-400 text-sm mt-1">Shin Art Ltd Legal Vault</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-slate-500">Status Acte:</div>
+                        <div class="text-emerald-400 font-bold uppercase font-mono">GEVALIDEERD & GEBORGD</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-between items-center">
+                <button onclick="closeModal('modal-deed-certificate')" class="px-4 py-2 bg-vault-800 text-slate-300 hover:text-white rounded-xl text-xs font-bold border border-slate-700">
+                    Sluiten
+                </button>
+                <button onclick="printDeedCertificate()" class="px-4 py-2 bg-gold-500 text-vault-900 hover:bg-gold-400 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <span>Afdrukken / Downloaden</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <footer class="border-t border-slate-800/80 bg-vault-900 py-6 mt-12 text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <span class="font-extrabold text-gold-400 font-mono">XBTC RWA Vault</span>
+                <span>© 2026 XBTC.LLC & Shin Art Ltd. Alle Rechten Voorbehouden.</span>
+            </div>
+            <div class="flex space-x-4 font-mono text-[11px]">
+                <span>10B Supply Tokenized Reserve</span>
+                <span>•</span>
+                <span class="text-emerald-400">Encrypted Freeport Protocol</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global App State
+        const state = {
+            activeTab: 'market',
+            audioEnabled: true,
+            userWallet: {
+                XBTC: 125450,
+                BTC: 0.1540,
+                mBTC: 154.0,
+                Sats: 15400000,
+                ETH: 3.85,
+                DOGE: 24500,
+                XRP: 4200
+            },
+            marketRates: {
+                BTC: 94250.00,
+                ETH: 3480.50,
+                DOGE: 0.185,
+                XRP: 1.12,
+                XBTC: 1.00 // 1 XBTC = $1.00 USD
+            },
+            mining: {
+                active: false,
+                hashrate: 120, // MH/s
+                minedXBTC: 0,
+                minedSats: 0,
+                intervalId: null,
+                logs: [],
+                chart: null,
+                chartData: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            },
+            assets: [],
+            selectedAssetForModal: null
+        };
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!state.audioEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                } else if (type === 'swap') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'claim') {
+                    // Fanfare chime
+                    const now = audioCtx.currentTime;
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(554.37, now + 0.1);
+                    osc.frequency.setValueAtTime(659.25, now + 0.2);
+                    osc.frequency.setValueAtTime(880, now + 0.3);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                    osc.start();
+                    osc.stop(now + 0.6);
+                } else if (type === 'mine') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.03);
+                }
+            } catch (e) {
+                console.log('Audio playback error:', e);
+            }
+        }
+
+        function toggleAudio() {
+            state.audioEnabled = !state.audioEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (state.audioEnabled) {
+                icon.setAttribute('data-lucide', 'volume-2');
+                showToast('Geluid Effecten Ingeschakeld', 'info');
+            } else {
+                icon.setAttribute('data-lucide', 'volume-x');
+                showToast('Geluid Effecten Uitgeschakeld', 'info');
+            }
+            lucide.createIcons();
+        }
+
+        function switchTab(tabName) {
+            playSound('click');
+            state.activeTab = tabName;
+
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+
+            // Show current tab
+            const target = document.getElementById(`tab-${tabName}`);
+            if (target) target.classList.remove('hidden');
+
+            // Update nav buttons styling
+            const navIds = ['market', 'mining', 'wallet', 'deeds', 'protocol'];
+            navIds.forEach(id => {
+                const deskBtn = document.getElementById(`nav-${id}`);
+                const mobBtn = document.getElementById(`mob-nav-${id}`);
+
+                if (id === tabName) {
+                    if (deskBtn) deskBtn.className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 text-gold-400 bg-gold-500/10 border border-gold-500/30";
+                    if (mobBtn) mobBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap bg-gold-500/20 text-gold-400 border border-gold-500/30";
+                } else {
+                    if (deskBtn) deskBtn.className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/50";
+                    if (mobBtn) mobBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap text-slate-400 bg-vault-800";
+                }
+            });
+
+            if (tabName === 'deeds') {
+                renderDeedsTab();
+            } else if (tabName === 'wallet') {
+                renderWalletTab();
+            }
+        }
+
+        function renderMarketplace(filter = 'all', searchQuery = '') {
+            const grid = document.getElementById('assets-grid');
+            grid.innerHTML = '';
+
+            const filtered = state.assets.filter(a => {
+                const matchesCategory = (filter === 'all' || a.category === filter);
+                const matchesSearch = a.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      a.refNr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      a.categoryLabel.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 glass-panel rounded-2xl">
+                        <i data-lucide="search-x" class="w-12 h-12 text-slate-500 mx-auto mb-3"></i>
+                        <p class="text-sm text-slate-400">Nog geen echte assets in deze selectie. Meld uw eigen asset hieronder aan; er worden geen voorbeeldobjecten getoond.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            filtered.forEach(asset => {
+                const card = document.createElement('div');
+                card.className = "glass-panel rounded-2xl overflow-hidden border border-slate-800 hover:border-gold-500/40 transition-all duration-300 flex flex-col justify-between group";
+                
+                card.innerHTML = `
+                    <div>
+                        <!-- Card Image Header -->
+                        <div class="relative h-48 overflow-hidden bg-vault-900 flex items-center justify-center">
+                            <img src="${asset.image}" alt="${asset.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-vault-900 via-transparent to-transparent"></div>
+                            
+                            <div class="absolute top-3 left-3 px-2 py-0.5 rounded text-[10px] font-mono bg-vault-900/90 text-gold-400 border border-gold-500/30">
+                                ${asset.refNr}
+                            </div>
+
+                            <div class="absolute top-3 right-3 px-2 py-0.5 rounded text-[10px] font-semibold ${asset.claimed ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800/80 text-slate-300'}">
+                                ${verificationLabel(asset)}
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-5 space-y-4">
+                            <div>
+                                <span class="text-[10px] uppercase font-mono text-slate-400">${asset.categoryLabel}</span>
+                                <h3 class="text-base font-bold text-white group-hover:text-gold-400 transition line-clamp-1">${asset.title}</h3>
+                            </div>
+
+                            <!-- Valuation Matrix Badges -->
+                            <div class="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                                <div class="bg-vault-900/90 p-2 rounded-lg border border-slate-800/80">
+                                    <span class="text-slate-500 block">Originaliteit:</span>
+                                    <span class="text-emerald-400 font-bold">${asset.originality}</span>
+                                </div>
+                                <div class="bg-vault-900/90 p-2 rounded-lg border border-slate-800/80">
+                                    <span class="text-slate-500 block">Status Herkomst:</span>
+                                    <span class="text-gold-400 font-bold truncate block">${asset.statusScore}</span>
+                                </div>
+                                <div class="bg-vault-900/90 p-2 rounded-lg border border-slate-800/80">
+                                    <span class="text-slate-500 block">Toestand:</span>
+                                    <span class="text-sky-400 font-bold">${asset.condition}</span>
+                                </div>
+                                <div class="bg-vault-900/90 p-2 rounded-lg border border-slate-800/80">
+                                    <span class="text-slate-500 block">Zeldzaamheid:</span>
+                                    <span class="text-purple-400 font-bold">${asset.rarity}</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-800 flex justify-between items-end">
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-mono">Marktwaarde Taxatie:</div>
+                                    <div class="text-base font-extrabold text-gold-400 font-mono">${asset.valueUsd>0?'$'+asset.valueUsd.toLocaleString()+' USD':'Waarde niet geverifieerd'}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-[10px] text-amber-300 font-mono font-bold">${asset.xbtcPrice.toLocaleString()} XBTC</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer Actions -->
+                    <div class="p-5 pt-0">
+                        <button onclick="openAssetModal('${asset.id}')" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-vault-800 hover:bg-gold-500 hover:text-vault-900 text-slate-200 border border-slate-700 hover:border-gold-500 transition duration-200 flex items-center justify-center space-x-2">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            <span>Bekijk Akte & Valutatie</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function filterMarket(cat) {
+            playSound('click');
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = "filter-btn px-4 py-2 rounded-lg text-xs font-medium bg-vault-800 text-slate-300 hover:text-white transition";
+            });
+            const active = document.getElementById(`filter-${cat}`);
+            if (active) {
+                active.className = "filter-btn px-4 py-2 rounded-lg text-xs font-medium bg-gold-500 text-vault-900 font-bold transition";
+            }
+            renderMarketplace(cat, document.getElementById('market-search').value);
+        }
+
+        function searchMarket() {
+            const query = document.getElementById('market-search').value;
+            renderMarketplace('all', query);
+        }
+
+        function openAssetModal(assetId) {
+            playSound('click');
+            const asset = state.assets.find(a => a.id === assetId);
+            if (!asset) return;
+
+            state.selectedAssetForModal = asset;
+
+            document.getElementById('modal-ref-nr').innerText = asset.refNr;
+            document.getElementById('modal-title').innerText = asset.title;
+            document.getElementById('modal-img').src = asset.image;
+            document.getElementById('modal-category').innerText = asset.categoryLabel;
+            document.getElementById('modal-val-usd').innerText = `${asset.valueUsd>0?'$'+asset.valueUsd.toLocaleString()+' USD':'Waarde niet geverifieerd'}`;
+            document.getElementById('modal-val-xbtc').innerText = `${asset.xbtcPrice.toLocaleString()} XBTC Tokens`;
+
+            document.getElementById('modal-score-orig').innerText = asset.originality;
+            document.getElementById('modal-score-status').innerText = asset.statusScore;
+            document.getElementById('modal-score-conditie').innerText = asset.condition;
+            document.getElementById('modal-score-rarity').innerText = asset.rarity;
+            document.getElementById('modal-desc').innerText = asset.desc;
+
+            const claimBtn = document.getElementById('btn-modal-claim');
+            claimBtn.disabled = !canBid(asset);
+            claimBtn.textContent = canBid(asset) ? 'PLAATS VOORLOPIG BOD · GEEN BETALING' : verificationLabel(asset) + ' · BIEDEN GEBLOKKEERD';
+            claimBtn.className = 'w-full p-3 rounded-xl text-xs font-bold bg-slate-800 text-amber-300 disabled:opacity-60';
+            document.getElementById('modal-desc').innerText = asset.desc + '\nVerificatie: ' + verificationLabel(asset) + '\nBetaling pas bij definitieve afwikkeling.';
+
+            document.getElementById('modal-asset-detail').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeModal(modalId) {
+            playSound('click');
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function claimAssetWithXBTC() {
+            const asset = state.selectedAssetForModal;
+            if (!asset || !canBid(asset)) {
+                showToast('Bieden geblokkeerd: onafhankelijke verificatie ontbreekt.', 'error');
+                return;
+            }
+            const raw = window.prompt('Voorlopig bod in hele XBTC. Betaling alleen bij afwikkeling.', String(asset.highestBid ? asset.highestBid.amount + 1 : asset.xbtcPrice));
+            if (raw === null) return;
+            const result = placeProvisionalBid(asset.id, Number(raw));
+            showToast(result.message, result.ok ? 'info' : 'error');
+        }
+
+        function updateHashrateSlider(val) {
+            state.mining.hashrate = parseInt(val);
+            document.getElementById('slider-value-display').innerText = `${val} MH/s`;
+            if (state.mining.active) {
+                document.getElementById('current-hashrate').innerText = `${val} MH/s`;
+            }
+        }
+
+        function toggleMiner() {
+            playSound('click');
+            const btn = document.getElementById('btn-toggle-miner');
+            const statusPill = document.getElementById('mining-status-pill');
+            const statusDot = document.getElementById('mining-status-dot');
+            const statusText = document.getElementById('mining-status-text');
+
+            if (!state.mining.active) {
+                // Start Miner
+                state.mining.active = true;
+                btn.innerHTML = `<i data-lucide="square" class="w-4 h-4 fill-current"></i><span>STOP MINER ENGINE</span>`;
+                btn.className = "flex-1 py-3 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white shadow-lg shadow-rose-500/20 transition flex items-center justify-center space-x-2";
+
+                statusPill.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 mt-1";
+                statusDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-ping mr-2";
+                statusText.innerText = "MINING ACTIEF";
+
+                document.getElementById('current-hashrate').innerText = `${state.mining.hashrate} MH/s`;
+
+                addMinerLog(`[MINER] Multi-Proof Node gestart op ${state.mining.hashrate} MH/s. Koppelende markten: BTC, ETH, DOGE.`);
+                showToast('Auto-Rewards Miner Succesvol Gestart!', 'success');
+
+                // Start mining tick interval
+                state.mining.intervalId = setInterval(runMiningTick, 2000);
+            } else {
+                // Stop Miner
+                state.mining.active = false;
+                clearInterval(state.mining.intervalId);
+
+                btn.innerHTML = `<i data-lucide="play" class="w-4 h-4 fill-current"></i><span>START MINER ENGINE</span>`;
+                btn.className = "flex-1 py-3 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-vault-900 shadow-lg shadow-emerald-500/20 transition flex items-center justify-center space-x-2";
+
+                statusPill.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700 mt-1";
+                statusDot.className = "w-2 h-2 rounded-full bg-slate-500 mr-2";
+                statusText.innerText = "OFFLINE";
+
+                document.getElementById('current-hashrate').innerText = `0 MH/s`;
+
+                addMinerLog(`[MINER] Mining node gepauzeerd door gebruiker.`);
+                showToast('Miner Engine Gepauzeerd.', 'info');
+            }
+            lucide.createIcons();
+        }
+
+        function runMiningTick() {
+            if (!state.mining.active) return;
+
+            playSound('mine');
+
+            // Calculate auto-reward based on BTC, ETH, DOGE
+            const weightBTC = state.marketRates.BTC / 90000;
+            const weightETH = state.marketRates.ETH / 3300;
+            const weightDOGE = state.marketRates.DOGE / 0.18;
+            const rewardMultiplier = ((0.5 * weightBTC) + (0.3 * weightETH) + (0.2 * weightDOGE)).toFixed(2);
+
+            document.getElementById('mining-multiplier').innerText = `${rewardMultiplier}x`;
+
+            // Mined XBTC increment
+            const incrementXBTC = (state.mining.hashrate * 0.085 * parseFloat(rewardMultiplier));
+            const incrementSats = Math.floor(incrementXBTC * 100);
+
+            state.mining.minedXBTC += incrementXBTC;
+            state.mining.minedSats += incrementSats;
+
+            // Credit to user wallet
+            state.userWallet.XBTC += incrementXBTC;
+            state.userWallet.Sats += incrementSats;
+
+            document.getElementById('mined-xbtc-session').innerText = `${state.mining.minedXBTC.toFixed(2)} XBTC`;
+            document.getElementById('mined-sats-session').innerText = `${state.mining.minedSats.toLocaleString()} Sats`;
+
+            updateWalletUI();
+
+            // Random block hash simulation
+            const blockHash = '0x' + Math.random().toString(16).substr(2, 8).toUpperCase();
+            addMinerLog(`[BLOCK ${blockHash}] +${incrementXBTC.toFixed(2)} XBTC auto-credited (${incrementSats} Sats)`);
+
+            // Update Chart
+            updateMiningChart(state.mining.minedXBTC);
+        }
+
+        function addMinerLog(msg) {
+            const container = document.getElementById('mining-log-container');
+            const entry = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            entry.innerHTML = `<span class="text-slate-500">[${time}]</span> ${msg}`;
+            container.prepend(entry);
+        }
+
+        function clearMinerLog() {
+            document.getElementById('mining-log-container').innerHTML = `<div class="text-slate-500">[SYSTEM] Mining terminal log gewist.</div>`;
+        }
+
+        function initMiningChart() {
+            const ctx = document.getElementById('miningChart').getContext('2d');
+            state.mining.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['10s', '8s', '6s', '4s', '2s', 'Nu'],
+                    datasets: [{
+                        label: 'XBTC Mined',
+                        data: [0, 0, 0, 0, 0, 0],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }
+                    }
+                }
+            });
+        }
+
+        function updateMiningChart(newVal) {
+            if (!state.mining.chart) return;
+            const data = state.mining.chart.data.datasets[0].data;
+            data.shift();
+            data.push(newVal);
+            state.mining.chart.update();
+        }
+
+        function renderWalletTab() {
+            const grid = document.getElementById('wallet-cards-grid');
+            grid.innerHTML = '';
+
+            const assetsList = [
+                { symbol: 'XBTC', name: 'XBTC Token (RWA Backed)', balance: state.userWallet.XBTC.toFixed(2), price: state.marketRates.XBTC, icon: 'coins', color: 'text-gold-400' },
+                { symbol: 'Sats', name: 'Satoshis (Bitcoin Sats)', balance: state.userWallet.Sats.toLocaleString(), price: state.marketRates.BTC / 100000000, icon: 'zap', color: 'text-yellow-400' },
+                { symbol: 'mBTC', name: 'milliBitcoin', balance: state.userWallet.mBTC.toFixed(2), price: state.marketRates.BTC / 1000, icon: 'bitcoin', color: 'text-amber-400' },
+                { symbol: 'BTC', name: 'Bitcoin', balance: state.userWallet.BTC.toFixed(4), price: state.marketRates.BTC, icon: 'bitcoin', color: 'text-orange-400' },
+                { symbol: 'ETH', name: 'Ethereum', balance: state.userWallet.ETH.toFixed(2), price: state.marketRates.ETH, icon: 'cpu', color: 'text-sky-300' },
+                { symbol: 'DOGE', name: 'Dogecoin', balance: state.userWallet.DOGE.toLocaleString(), price: state.marketRates.DOGE, icon: 'dog', color: 'text-yellow-300' },
+                { symbol: 'XRP', name: 'Ripple', balance: state.userWallet.XRP.toLocaleString(), price: state.marketRates.XRP, icon: 'activity', color: 'text-cyan-400' }
+            ];
+
+            let totalUsd = 0;
+
+            assetsList.forEach(a => {
+                let numericBal = parseFloat(a.balance.replace(/,/g, ''));
+                if (a.symbol === 'Sats') numericBal = state.userWallet.Sats;
+                const usdVal = numericBal * a.price;
+                totalUsd += usdVal;
+
+                const card = document.createElement('div');
+                card.className = "bg-vault-900/90 p-4 rounded-xl border border-slate-800 flex justify-between items-center";
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2.5 rounded-lg bg-vault-800 border border-slate-700 ${a.color}">
+                            <i data-lucide="${a.icon}" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-white">${a.symbol}</div>
+                            <div class="text-[10px] text-slate-400">${a.name}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-bold font-mono text-slate-100">${a.balance}</div>
+                        <div class="text-[10px] text-slate-400 font-mono">$${usdVal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            renderOwnedRealAssets();
+            document.getElementById('wallet-total-usd').innerText = `$${totalUsd.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD`;
+            calculateSwap();
+            runConverterApp();
+            lucide.createIcons();
+        }
+
+        function updateWalletUI() {
+            document.getElementById('header-xbtc-balance').innerText = `${state.userWallet.XBTC.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2})} XBTC`;
+            if (state.activeTab === 'wallet') {
+                renderWalletTab();
+            }
+        }
+
+        function runConverterApp() {
+            const inputXbtc = parseFloat(document.getElementById('calc-input-xbtc').value) || 0;
+            const usdTotal = inputXbtc * state.marketRates.XBTC;
+
+            const sats = inputXbtc * 100;
+            const btc = usdTotal / state.marketRates.BTC;
+            const mbtc = btc * 1000;
+            const eth = usdTotal / state.marketRates.ETH;
+
+            document.getElementById('calc-res-sats').innerText = `${sats.toLocaleString()} Sats`;
+            document.getElementById('calc-res-mbtc').innerText = `${mbtc.toFixed(2)} mBTC`;
+            document.getElementById('calc-res-btc').innerText = `${btc.toFixed(6)} BTC`;
+            document.getElementById('calc-res-eth').innerText = `${eth.toFixed(4)} ETH`;
+        }
+
+        function calculateSwap() {
+            const fromSym = document.getElementById('swap-from-select').value;
+            const toSym = document.getElementById('swap-to-select').value;
+            const amount = parseFloat(document.getElementById('swap-from-amount').value) || 0;
+
+            // Get prices in USD
+            const prices = {
+                XBTC: state.marketRates.XBTC,
+                BTC: state.marketRates.BTC,
+                mBTC: state.marketRates.BTC / 1000,
+                SATS: state.marketRates.BTC / 100000000,
+                ETH: state.marketRates.ETH,
+                DOGE: state.marketRates.DOGE,
+                XRP: state.marketRates.XRP
+            };
+
+            const fromUsd = amount * (prices[fromSym] || 1);
+            const toAmount = fromUsd / (prices[toSym] || 1);
+
+            document.getElementById('swap-to-amount').value = toAmount.toLocaleString(undefined, {maximumFractionDigits: 6});
+            document.getElementById('swap-rate-display').innerText = `1 ${fromSym} ≈ ${((prices[fromSym]) / (prices[toSym])).toFixed(4)} ${toSym}`;
+
+            // Update max balance indicator
+            if (fromSym === 'XBTC') document.getElementById('swap-from-max').innerText = state.userWallet.XBTC.toFixed(0);
+            else if (fromSym === 'BTC') document.getElementById('swap-from-max').innerText = state.userWallet.BTC.toFixed(4);
+            else if (fromSym === 'ETH') document.getElementById('swap-from-max').innerText = state.userWallet.ETH.toFixed(2);
+            else if (fromSym === 'DOGE') document.getElementById('swap-from-max').innerText = state.userWallet.DOGE.toString();
+        }
+
+        function setSwapMax() {
+            const fromSym = document.getElementById('swap-from-select').value;
+            if (fromSym === 'XBTC') document.getElementById('swap-from-amount').value = state.userWallet.XBTC;
+            else if (fromSym === 'BTC') document.getElementById('swap-from-amount').value = state.userWallet.BTC;
+            else if (fromSym === 'ETH') document.getElementById('swap-from-amount').value = state.userWallet.ETH;
+            else if (fromSym === 'DOGE') document.getElementById('swap-from-amount').value = state.userWallet.DOGE;
+            calculateSwap();
+        }
+
+        function invertSwap() {
+            playSound('click');
+            const from = document.getElementById('swap-from-select');
+            const to = document.getElementById('swap-to-select');
+            const temp = from.value;
+            from.value = to.value;
+            to.value = temp;
+            calculateSwap();
+        }
+
+        function executeSwap() {
+            const fromSym = document.getElementById('swap-from-select').value;
+            const toSym = document.getElementById('swap-to-select').value;
+            const fromAmt = parseFloat(document.getElementById('swap-from-amount').value) || 0;
+            const toAmtStr = document.getElementById('swap-to-amount').value;
+            const toAmt = parseFloat(toAmtStr.replace(/,/g, '')) || 0;
+
+            if (fromAmt <= 0) {
+                showToast('Voer een geldig aantal in om te ruilen.', 'error');
+                return;
+            }
+
+            // Check balances
+            if (fromSym === 'XBTC' && state.userWallet.XBTC < fromAmt) {
+                showToast('Onvoldoende XBTC saldo voor deze swap.', 'error');
+                return;
+            }
+
+            // Perform balance exchange
+            if (fromSym === 'XBTC') state.userWallet.XBTC -= fromAmt;
+            if (fromSym === 'BTC') state.userWallet.BTC -= fromAmt;
+            if (fromSym === 'ETH') state.userWallet.ETH -= fromAmt;
+            if (fromSym === 'DOGE') state.userWallet.DOGE -= fromAmt;
+
+            if (toSym === 'XBTC') state.userWallet.XBTC += toAmt;
+            if (toSym === 'SATS') state.userWallet.Sats += Math.floor(toAmt);
+            if (toSym === 'mBTC') state.userWallet.mBTC += toAmt;
+            if (toSym === 'BTC') state.userWallet.BTC += toAmt;
+            if (toSym === 'ETH') state.userWallet.ETH += toAmt;
+            if (toSym === 'DOGE') state.userWallet.DOGE += toAmt;
+            if (toSym === 'XRP') state.userWallet.XRP += toAmt;
+
+            playSound('swap');
+            updateWalletUI();
+
+            showToast(`Swap Succesvol! ${fromAmt} ${fromSym} omgeruild voor ${toAmtStr} ${toSym}.`, 'success');
+
+            // Log history
+            const hist = document.getElementById('swap-history-list');
+            const item = document.createElement('div');
+            item.className = "p-2 rounded bg-vault-900/60 border border-slate-800 flex justify-between";
+            item.innerHTML = `<span class="text-slate-300">${fromAmt} ${fromSym} → ${toAmtStr} ${toSym}</span><span class="text-emerald-400">Succes</span>`;
+            hist.prepend(item);
+        }
+
+        function renderDeedsTab() {
+            const container = document.getElementById('deeds-container-grid');
+            container.innerHTML = '';
+
+            const claimedAssets = state.assets.filter(a => a.claimed);
+            document.getElementById('badge-deeds-count').innerText = claimedAssets.length;
+
+            if (claimedAssets.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <i data-lucide="shield-alert" class="w-12 h-12 text-slate-500 mx-auto mb-3"></i>
+                        <p class="text-sm text-slate-400">U heeft op dit moment nog geen Real World Assets geborgd of opgeëist.</p>
+                        <button onclick="switchTab('market')" class="mt-4 px-4 py-2 bg-gold-500 text-vault-900 font-bold rounded-xl text-xs">Bekijk Marktplaats</button>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            claimedAssets.forEach(asset => {
+                const card = document.createElement('div');
+                card.className = "glass-panel p-5 rounded-2xl border border-gold-500/40 space-y-4 relative overflow-hidden";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                        <div>
+                            <span class="text-[10px] font-mono text-gold-400">${asset.refNr}</span>
+                            <h3 class="text-base font-bold text-white mt-0.5">${asset.title}</h3>
+                        </div>
+                        <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            EIGENDOMSMODE ACTIEF
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 text-xs font-mono">
+                        <div class="bg-vault-900/90 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-slate-500 text-[10px] block">Juridisch Beheerder:</span>
+                            <span class="text-amber-300 font-bold">XBTC.LLC & Shin Art Ltd</span>
+                        </div>
+                        <div class="bg-vault-900/90 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-slate-500 text-[10px] block">Borgstelling:</span>
+                            <span class="text-gold-400 font-bold">${asset.xbtcPrice.toLocaleString()} XBTC</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-[11px] text-slate-400">Gevalideerd op Blockchain Vault</span>
+                        <button onclick="openDeedCertificateModal('${asset.id}')" class="px-3 py-1.5 bg-gold-500/20 text-gold-400 hover:bg-gold-500/30 border border-gold-500/40 rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                            <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                            <span>Toon Originele Akte</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function openDeedCertificateModal(assetId) {
+            playSound('click');
+            const asset = state.assets.find(a => a.id === assetId);
+            if (!asset) return;
+
+            document.getElementById('deed-cert-ref').innerText = asset.refNr;
+            document.getElementById('deed-cert-title').innerText = asset.title;
+            document.getElementById('deed-cert-val').innerText = `${asset.xbtcPrice.toLocaleString()} XBTC (${asset.valueUsd>0?'$'+asset.valueUsd.toLocaleString()+' USD':'Waarde niet geverifieerd'})`;
+            document.getElementById('deed-cert-owner').innerText = asset.deedOwner;
+
+            document.getElementById('modal-deed-certificate').classList.remove('hidden');
+        }
+
+        function printDeedCertificate() {
+            playSound('click');
+            window.print();
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            let bgColor = 'bg-vault-800 text-slate-200 border-slate-700';
+            let icon = 'info';
+
+            if (type === 'success') {
+                bgColor = 'bg-emerald-950 text-emerald-200 border-emerald-500/50';
+                icon = 'check-circle';
+            } else if (type === 'error') {
+                bgColor = 'bg-rose-950 text-rose-200 border-rose-500/50';
+                icon = 'alert-triangle';
+            }
+
+            toast.className = `p-4 rounded-xl border shadow-xl flex items-center space-x-3 text-xs pointer-events-auto max-w-md backdrop-blur-md ${bgColor} animate-bounce-once`;
+            toast.innerHTML = `
+                <i data-lucide="${icon}" class="w-5 h-5 flex-shrink-0"></i>
+                <span class="flex-grow">${message}</span>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'transition', 'duration-300');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function startTickerSimulation() {
+            setInterval(() => {
+                // Random subtle price fluctuations
+                const btcDelta = (Math.random() - 0.48) * 120;
+                const ethDelta = (Math.random() - 0.48) * 8;
+                const dogeDelta = (Math.random() - 0.48) * 0.002;
+
+                state.marketRates.BTC = Math.max(80000, state.marketRates.BTC + btcDelta);
+                state.marketRates.ETH = Math.max(2500, state.marketRates.ETH + ethDelta);
+                state.marketRates.DOGE = Math.max(0.1, state.marketRates.DOGE + dogeDelta);
+
+                document.getElementById('ticker-btc-price').innerText = `$${state.marketRates.BTC.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('ticker-eth-price').innerText = `$${state.marketRates.ETH.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('ticker-doge-price').innerText = `$${state.marketRates.DOGE.toFixed(3)}`;
+
+                if (state.activeTab === 'wallet') {
+                    calculateSwap();
+                }
+            }, 3000);
+        }
+
+
+        // Local prototype only. Approval must come from an authenticated backend in production.
+        const verificationStorageKey = 'xbtc-real-assets-v2';
+        const auditEvents = [];
+        function escapeText(value) {
+            return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+        function canBid(asset) {
+            if (asset.auctionStatus === 'closed') return false;
+            const v = asset.verification;
+            return !!v && ['identity','ownership','authority','authenticity','condition','delivery'].every(k => v[k] === 'approved');
+        }
+        function verificationLabel(asset) {
+            return canBid(asset) ? 'GOEDGEKEURD VOOR BIEDEN' : 'EIGENAAR / KUNSTWERK: IN BEHANDELING';
+        }
+        function recordAudit(type, assetId, amount = '') {
+            auditEvents.push({time:new Date().toISOString(), type, assetId, amount});
+            saveVerificationState();
+        }
+        function saveVerificationState() {
+            try {
+                localStorage.setItem(verificationStorageKey, JSON.stringify({submissions:state.assets.filter(a=>a.userSubmitted).map(a=>({...a, verification:undefined, highestBid:undefined, claimed:false})),auditEvents}));
+                document.getElementById('verification-storage').textContent = 'Prototypegegevens lokaal opgeslagen in deze browser. Geen gedeelde database.';
+            } catch (_) {
+                document.getElementById('verification-storage').textContent = 'Lokale opslag niet beschikbaar. Houd deze pagina open en exporteer uw gegevens.';
+            }
+        }
+        function updateBidSummary() {
+            const bids = state.assets.filter(a=>canBid(a) && a.highestBid);
+            const total = bids.reduce((sum,a)=>sum+a.highestBid.amount,0);
+            document.getElementById('bid-summary').textContent = 'Voorlopige winnende biedingen: ' + total.toLocaleString() + ' XBTC · Niet betaald · Geen geverifieerde fondsen';
+        }
+        function placeProvisionalBid(assetId, amount) {
+            const asset = state.assets.find(a=>a.id===assetId);
+            if (!asset || !canBid(asset)) return {ok:false,message:'Verificatie ontbreekt; bieden geblokkeerd.'};
+            if (!Number.isSafeInteger(amount) || amount < asset.xbtcPrice || amount <= (asset.highestBid?.amount || 0) || amount > 10000000000) return {ok:false,message:'Voer een hoger geldig bod in hele XBTC in.'};
+            // This single-user prototype cannot establish real funds or competing buyer identities.
+            const other = state.assets.filter(a=>a.id!==assetId && a.highestBid?.bidder==='local-demo').reduce((n,a)=>n+a.highestBid.amount,0);
+            if (other + amount > state.userWallet.XBTC) return {ok:false,message:'Biedingen samen overschrijden uw voorbeeldsaldo.'};
+            if (asset.highestBid) recordAudit('outbid',assetId,asset.highestBid.amount);
+            asset.highestBid = {amount,bidder:'local-demo',status:'provisional-unpaid'};
+            recordAudit('bid-provisional-unpaid',assetId,amount);
+            updateBidSummary();
+            return {ok:true,message:'Voorlopig bod geregistreerd. Geen tokens afgeschreven; geen eigendom overgedragen.'};
+        }
+        function exportVerificationRecords() {
+            const rows = [['time','event','asset_id','amount_XBTC'], ...auditEvents.map(e=>[e.time,e.type,e.assetId,e.amount])];
+            const cell = v => '"' + String(v).replace(/^[=+@-]/,"'$&").replace(/"/g,'""') + '"';
+            const blob = new Blob(['\ufeff'+rows.map(r=>r.map(cell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'});
+            const url = URL.createObjectURL(blob), a=document.createElement('a');
+            a.href=url;a.download='xbtc-verification-audit.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+        }
+        function initializeVerification() {
+            // Existing example records have not been independently verified.
+            state.assets.forEach(a=>{a.claimed=false;a.deedOwner='Verkoper · niet geverifieerd';a.verification={};});
+            try {
+                const saved=JSON.parse(localStorage.getItem(verificationStorageKey)||'{}');
+                if (Array.isArray(saved.submissions)) saved.submissions.slice(0,100).forEach(a=>{
+                    if (!a || a.realAsset!==true || typeof a.title!=='string' || !Number.isSafeInteger(a.xbtcPrice) || a.xbtcPrice<1) return;
+                    state.assets.push({...a,id:'submitted-'+state.assets.length,title:a.title,refNr:'PENDING-'+state.assets.length,category:['painting','antique','sculpture','rare'].includes(a.category)?a.category:'painting',categoryLabel:escapeText(a.categoryLabel||'Asset'),image:/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(a.image||'')?a.image:'',originality:'Niet beoordeeld',statusScore:'In behandeling',condition:'Niet beoordeeld',rarity:'Niet beoordeeld',desc:'Lokale inzending; bewijsstukken en identiteit nog te controleren.',verification:{},highestBid:undefined,claimed:false,userSubmitted:true});
+                });
+                if (Array.isArray(saved.auditEvents)) auditEvents.push(...saved.auditEvents.slice(-2000));
+            } catch (_) {}
+            document.getElementById('owner-submission').addEventListener('submit', async event=>{
+                event.preventDefault();const form=event.currentTarget;
+                if (!form.reportValidity()) return;
+                const d=new FormData(form), price=Number(d.get('price'));
+                if (!Number.isSafeInteger(price)||price<1||price>10000000000) return;
+                const photo=d.get('photo');
+                if (!(photo instanceof File) || !['image/jpeg','image/png','image/webp'].includes(photo.type) || photo.size>2*1024*1024) { showToast('Kies een JPEG, PNG of WebP foto van maximaal 2 MB.','info');return; }
+                let image;
+                try { image=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(photo);}); } catch (_) {showToast('Foto kon niet worden gelezen.','info');return;}
+                const category=d.get('category'), labels={painting:'Schilderij',antique:'Antiek',sculpture:'Sculptuur',rare:'Verzamelobject'};
+                const id='submitted-'+Date.now();
+                state.assets.push({id,refNr:'PENDING-'+Date.now(),title:escapeText(d.get('title')),owner:escapeText(d.get('owner')),country:escapeText(d.get('country')),ownershipReference:escapeText(d.get('ownership')),provenanceReference:escapeText(d.get('provenance')),category,categoryLabel:labels[category],valueUsd:0,xbtcPrice:price,image,realAsset:true,originality:'Niet beoordeeld',statusScore:'In behandeling',condition:'Niet beoordeeld',rarity:'Niet beoordeeld',desc:'Eigenaar houdt bezit; beoordeling en leveringsafspraken nog vereist.',claimed:false,deedOwner:'Verkoper',verification:{},userSubmitted:true});
+                recordAudit('submission-pending-owner-verification',id);
+                form.reset();renderMarketplace('all');updateBidSummary();
+                showToast('Ingediend: eigenaarverificatie in behandeling. Bieden blijft geblokkeerd.','info');
+            });
+            saveVerificationState();updateBidSummary();
+            document.getElementById('badge-deeds-count').textContent='0';
+        }
+
+        function renderOwnedRealAssets() {
+            const grid=document.getElementById('real-wallet-assets');
+            grid.replaceChildren();
+            const owned=state.assets.filter(a=>a.realAsset && a.claimed);
+            if (!owned.length) { const p=document.createElement('p');p.textContent='Nog geen definitief toegewezen assets. Er wordt geen voorbeeldbezit getoond.';grid.appendChild(p);return; }
+            owned.forEach(a=>{const p=document.createElement('p');p.textContent=a.title+' · Definitieve afwikkeling vereist geverifieerd bewijs';grid.appendChild(p);});
+        }
+
+        window.onload = function () {
+            initializeVerification();
+            lucide.createIcons();
+            renderMarketplace('all');
+            renderOwnedRealAssets();
+            initMiningChart();
+            startTickerSimulation();
+            updateWalletUI();
+        };
+    </script>
+
+<style>
+#member-entry{position:fixed;inset:0;z-index:99999;overflow:auto;background:#070b13;color:#e9edf6;padding:32px 20px;font-family:system-ui,sans-serif}#member-entry *{box-sizing:border-box}.member-wrap{max-width:920px;margin:4vh auto}.member-brand{color:#d9b86e;letter-spacing:3px;font-size:13px}.member-title{font-size:clamp(30px,6vw,52px);line-height:1.1;margin:18px 0}.member-muted{color:#a8b5c9}.member-plans{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0}.member-plan{border:1px solid #35425a;border-radius:16px;padding:22px;background:#111a29;cursor:pointer}.member-plan:has(input:checked){border-color:#e5bd68;background:#242318}.member-plan strong{display:block;font-size:32px;margin:12px 0}.member-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.member-box{background:#111a29;border:1px solid #29374d;padding:24px;border-radius:16px}.member-box label{display:block;margin:14px 0 6px}.member-box input{width:100%;padding:12px;background:#080e19;color:white;border:1px solid #43516a;border-radius:8px}.member-button{padding:13px 18px;border-radius:8px;background:#e5bd68;color:#101520;border:0;font-weight:700;cursor:pointer;margin-top:16px}.member-button:disabled{opacity:.55;cursor:not-allowed}.member-note{font-size:13px;line-height:1.6}.member-link{background:none;color:#e5bd68;border:0;text-decoration:underline;cursor:pointer;margin-top:20px}@media(max-width:650px){.member-plans,.member-grid{grid-template-columns:1fr}.member-wrap{margin:0 auto}.member-plan{padding:15px}.member-plan strong{display:inline;margin-left:15px}}
+</style>
+<section id="member-entry" aria-labelledby="member-title">
+<div class="member-wrap"><p class="member-brand">SHINE ART LTD · XBTC EXCHANGE</p>
+<h1 class="member-title" id="member-title">Your access to XBTC.</h1>
+<p class="member-muted">Start with a 10-day free trial, then choose your subscription.</p>
+<fieldset style="border:0;padding:0;margin:0"><legend style="margin-top:20px">Plans after your 10-day free trial · EUR</legend>
+<div class="member-plans">
+<label class="member-plan"><input type="radio" name="member-plan" value="Weekly · €9 per week"> Weekly<strong>€9</strong><span>per week</span></label>
+<label class="member-plan"><input type="radio" name="member-plan" value="Monthly · €20 per month" checked> Monthly<strong>€20</strong><span>per month</span></label>
+<label class="member-plan"><input type="radio" name="member-plan" value="Yearly · €80 per year"> Yearly<strong>€80</strong><span>per year</span></label>
+</div></fieldset>
+<div class="member-grid"><section class="member-box"><h2 style="font-size:22px">Log in</h2>
+<p class="member-note member-muted">Preview only. Secure account login is not connected yet. Do not enter real credentials.</p>
+<label for="member-email">Email address</label><input id="member-email" type="email" placeholder="Email" disabled>
+<label for="member-password">Password</label><input id="member-password" type="password" placeholder="Password" disabled>
+<button class="member-button" disabled>Log in · coming soon</button></section>
+<section class="member-box"><h2 style="font-size:22px">Your subscription</h2>
+<p id="member-selection" style="margin:16px 0;color:#e5bd68" aria-live="polite">Monthly · €20 per month</p>
+<p class="member-note" style="color:#e5bd68;font-weight:700">Donate</p>
+<p class="member-note">PayPal recipient: <strong>@alvineeckels002</strong> (confirmed by you).</p>
+<p class="member-note member-muted">Your first 10 days are free. Trial activation and PayPal checkout will become available once secure accounts, trial tracking, subscription billing and payment verification are configured. No trial starts and no payment is collected by this preview.</p>
+<button class="member-button" disabled>Start 10-day free trial · setup pending</button>
+<p class="member-note member-muted" style="margin-top:14px">A subscription does not purchase XBTC or artwork.</p></section></div>
+<button id="member-preview" class="member-link" type="button">Explore exchange preview →</button>
+<p class="member-note member-muted">Preview access does not indicate an active or paid subscription.</p>
+</div></section>
+<script>
+document.querySelectorAll('input[name="member-plan"]').forEach(function(radio){radio.addEventListener('change',function(){document.getElementById('member-selection').textContent=this.value;});});
+document.getElementById('member-preview').addEventListener('click',function(){document.getElementById('member-entry').hidden=true;document.body.style.overflow='';document.getElementById('member-return').hidden=false;});
+document.body.style.overflow='hidden';
+</script>
+<button id="member-return" type="button" hidden style="position:fixed;right:16px;bottom:16px;z-index:99998;padding:12px 18px;border-radius:10px;background:#e5bd68;color:#101520;font-weight:bold" onclick="document.getElementById('member-entry').hidden=false;document.body.style.overflow='hidden';this.hidden=true">Login & subscriptions</button>
+
+</body>
+</html>
