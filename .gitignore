@@ -1,0 +1,30 @@
+# Local credentials and environment overrides
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+secrets/
+credentials/
+# Wallet data and recovery material must never be committed
+wallet.dat
+wallet.dat.*
+wallets/
+seed.txt
+mnemonic.txt
+recovery-phrase.txt
+# Local node data, configuration, logs and build output
+/data/
+/blocks/
+/chainstate/
+/xbtc.conf
+/log.conf
+*.log
+/build/
+/cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
