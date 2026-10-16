@@ -217,7 +217,7 @@ public final class SolanaWallet {
                 n = n.multiply(BigInteger.valueOf(58)).add(BigInteger.valueOf(digit));
             }
             byte[] input = n.toByteArray();
-            int start = input.length > 1 && input[0] == 0 ? 1 : 0;
+            int start = n.signum() == 0 ? input.length : (input.length > 1 && input[0] == 0 ? 1 : 0);
             int zeroes = 0;
             while (zeroes < text.length() && text.charAt(zeroes) == '1') zeroes++;
             int numberLength = input.length - start;
