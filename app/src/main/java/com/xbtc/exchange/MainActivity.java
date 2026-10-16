@@ -1,17 +1,17 @@
 package com.xbtc.exchange;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import org.json.JSONObject;
 import java.security.MessageDigest;
+import java.io.ByteArrayInputStream;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -25,20 +25,22 @@ public class MainActivity extends Activity {
         webView = new WebView(this);
         webView.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                Uri uri = request.getUrl();
-                if ("file".equals(uri.getScheme()) && "android_asset".equals(uri.getHost())) {
-                    return false;
-                }
-                if ("https".equals(uri.getScheme()) && "explorer.solana.com".equals(uri.getHost())) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                }
-                // Prevent arbitrary network pages from receiving the local JavaScript bridge.
-                return true;
+                // Never open another app, wallet, browser or remote page.
+                return !"file:///android_asset/index.html".equals(request.getUrl().toString());
+            }
+            @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                // Only the bundled HTML is ever used by this offline WebView.
+                if ("file:///android_asset/index.html".equals(request.getUrl().toString())) return null;
+                return new WebResourceResponse("text/plain", "UTF-8",
+                        new ByteArrayInputStream(new byte[0]));
             }
         });
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setAllowFileAccess(true);
+        webView.getSettings().setAllowContentAccess(false);
+        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
+        webView.getSettings().setSupportMultipleWindows(false);
         webView.getSettings().setAllowFileAccessFromFileURLs(false);
         webView.getSettings().setAllowUniversalAccessFromFileURLs(false);
         webView.addJavascriptInterface(new MiningBridge(), "XbtcPhoneWork");
