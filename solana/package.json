@@ -1,0 +1,18 @@
+{
+  "name": "xbtc-solana-operator",
+  "private": true,
+  "type": "module",
+  "description": "Operator-only, locally signed XBTC SPL mint workflow; never runs in the public exchange.",
+  "scripts": {
+    "plan": "node xbtc.mjs plan",
+    "status": "node xbtc.mjs status",
+    "create": "node xbtc.mjs create",
+    "mint": "node xbtc.mjs mint",
+    "test": "node --test config.test.mjs"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4",
+    "@solana/spl-token": "^0.4.13"
+  },
+  "engines": {"node": ">=20"}
+}
