@@ -43,6 +43,8 @@ footer{border-top:1px solid var(--border);padding:22px 17px;text-align:center;co
 <button type="button" data-page="drafts">My assets</button>
 <button type="button" data-page="finance">Fees</button>
 <button type="button" data-page="wallet">XBTC wallet</button>
+<button type="button" data-page="miner">Phone mining test</button>
+<button type="button" data-page="compliance">Launch review</button>
 </nav>
 <main>
 <section class="page active" id="market">
@@ -83,7 +85,39 @@ footer{border-top:1px solid var(--border);padding:22px 17px;text-align:center;co
 </section>
 <section class="page" id="wallet">
 <h1>XBTC wallet & verification</h1><div class="card"><h2>Wallet connection</h2><p>No real XBTC wallet or on-chain balance is connected in this build.</p><span class="pill">Not connected</span></div>
-<div class="card"><h2>Verify blockchain records</h2><p>Real transactions can be verified once the token mint address, chain, and transaction signature are confirmed. A test ledger balance does not establish token ownership.</p><p class="small muted">Solana devnet tokens are test tokens and have no monetary value.</p></div>
+<div class="card"><h2>Verify blockchain records</h2><p>Real transactions can be verified once the token mint address, chain, and transaction signature are confirmed. A test ledger balance does not establish token ownership.</p><p class="small muted">Solana Mainnet is selected as the intended XBTC settlement chain. There is no verified XBTC Mainnet mint address yet. Devnet is for tests only.</p><label for="solanaNetwork">Solana network</label><select id="solanaNetwork"><option value="mainnet">Mainnet (production)</option><option value="devnet">Devnet (test only)</option></select><label for="mintAddress">Token mint address (read-only lookup)</label><input id="mintAddress" placeholder="Paste a verified Solana token mint address" autocomplete="off" spellcheck="false"><label for="transactionSignature">Transaction signature (read-only lookup)</label><input id="transactionSignature" placeholder="Paste a transaction signature" autocomplete="off" spellcheck="false"><button id="checkTx" type="button">Prepare copy-only blockchain reference</button><p id="txMessage" role="status" class="status"></p><label for="txExplorer">Manual Explorer URL (never opens another app)</label><input id="txExplorer" type="text" readonly placeholder="Enter an address or signature"><p class="small muted">Copy the resulting reference manually if needed. XBTC will not open wallet apps, contact remote services, or access balances. The URL is not proof of successful token issuance or payment.</p></div>
+</section>
+<section class="page" id="miner">
+<h1>Phone proof-of-work</h1>
+<p class="muted">Test a new XBTC-branded phone-friendly proof-of-work experiment. Runs on this Android phone only when you press Start.</p>
+<div class="card">
+<h2>Local SHA-256 work test</h2>
+<span class="pill">Experimental · No XBTC rewards</span>
+<p>One capped CPU thread, local 12-bit example difficulty, a maximum of 30 seconds per session, and an automatic stop when the app leaves the foreground. The algorithm is not the Bitcoin protocol or an approved XBTC consensus algorithm.</p>
+<div class="grid">
+<div class="metric">Hashes attempted<strong id="miningAttempts">0</strong></div>
+<div class="metric">XBTC earned<strong>0</strong></div>
+</div>
+<div class="actions"><button id="startMining" type="button" class="primary">Start phone test</button><button id="stopMining" type="button">Stop</button></div>
+<p id="miningState" class="status" role="status">Not running. No XBTC blockchain is connected.</p>
+<p id="miningProof" class="small mono muted"></p>
+</div>
+<div class="card"><h2>Commercial mining subscription</h2><p>Proposed €1 for 1 TH/s for one week. Phone hash tests are not terahash subscriptions. Payment is disabled until real hashrate, delivery, pricing, merchant verification and legal compliance are established.</p><span class="pill">Payments unavailable</span></div>
+</section>
+<section class="page" id="compliance">
+<h1>MiCA & launch review</h1><p class="muted">Launch requirements for customer-facing crypto services. No licence is asserted for XBTC.</p>
+<div class="card"><h2>Live trading is disabled</h2>
+<p>Until an authorisation or an appropriately authorised provider has been independently verified, the APK does not buy or sell XBTC for euros, hold customer crypto, process mining payments, take customer deposits, settle auctions, or transmit customer orders.</p>
+<span class="pill">Regulatory authorisation not verified</span>
+</div>
+<div class="card"><h2>Release checklist</h2>
+<p>1. Establish the legal operator and exact services offered; obtain an EU legal classification of XBTC and the artwork or metal ownership rights.</p>
+<p>2. Verify regulatory authorisation or permitted provider arrangements, including appropriate MiCA CASP permissions and any financial-instrument requirements.</p>
+<p>3. Implement identity, AML, fraud prevention, transaction monitoring, sanctions controls, client disclosures, complaints and refunds.</p>
+<p>4. Verify seller ownership, asset authenticity, custody, auction terms, delivery and title transfer.</p>
+<p>5. Use a real mint address, validated wallet transactions, secure EUR payments, reconciled settlements and documented seller payouts.</p>
+<p class="small warning">A phone call or promise does not establish an issued regulatory authorisation.</p>
+</div>
 </section>
 </main>
 <footer>XBTC Marketplace · Private draft preview · No public offering, trading or settlement</footer>
@@ -186,6 +220,43 @@ footer{border-top:1px solid var(--border);padding:22px 17px;text-align:center;co
   }
   ['saleAmount', 'feePercent'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', calculateFees);
+  });
+  // Only prepare a public Explorer URL after validating a Solana-format signature.
+  document.getElementById('checkTx').addEventListener('click', function () {
+    var signature = document.getElementById('transactionSignature').value.trim();
+    var mint = document.getElementById('mintAddress').value.trim();
+    var network = document.getElementById('solanaNetwork').value;
+    var link = document.getElementById('txExplorer');
+    link.value = '';
+    var isMint = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(mint);
+    var isSignature = /^[1-9A-HJ-NP-Za-km-z]{64,88}$/.test(signature);
+    if (!isSignature && !isMint) {
+      document.getElementById('txMessage').textContent = 'Paste a valid-looking Solana mint address or transaction signature (base58).';
+      return;
+    }
+    // URLs are prepared locally only; no network requests or external app launches.
+    var suffix = network === 'devnet' ? '?cluster=devnet' : '';
+    link.value = 'https://explorer.solana.com/' + (isSignature ? 'tx/' + encodeURIComponent(signature) : 'address/' + encodeURIComponent(mint)) + suffix;
+    document.getElementById('txMessage').textContent = 'Copy-only reference prepared for ' + (network === 'devnet' ? 'Solana Devnet' : 'Solana Mainnet') + '. This app has NOT verified transaction success or token ownership.';
+  });
+  window.xbtcMiningUpdate = function (state, hashes, proof) {
+    document.getElementById('miningState').textContent = state;
+    document.getElementById('miningAttempts').textContent = Number(hashes).toLocaleString('en-US');
+    document.getElementById('miningProof').textContent = proof ? 'First local proof: ' + proof : 'No qualifying local proof reported yet.';
+  };
+  document.getElementById('startMining').addEventListener('click', function () {
+    if (!window.XbtcPhoneWork || typeof window.XbtcPhoneWork.start !== 'function') {
+      document.getElementById('miningState').textContent = 'Phone test only works in the installed Android APK.';
+      return;
+    }
+    document.getElementById('miningAttempts').textContent = '0';
+    document.getElementById('miningProof').textContent = '';
+    document.getElementById('miningState').textContent = 'Starting local proof-of-work...';
+    window.XbtcPhoneWork.start();
+  });
+  document.getElementById('stopMining').addEventListener('click', function () {
+    if (window.XbtcPhoneWork && window.XbtcPhoneWork.stop) window.XbtcPhoneWork.stop();
+    document.getElementById('miningState').textContent = 'Stop requested. No XBTC earned.';
   });
   renderDrafts(); calculateFees();
 })();

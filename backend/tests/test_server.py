@@ -214,3 +214,43 @@ def test_bitcoin_rpc_mock_regtest_read_only(monkeypatch, client):
                          json={"id": 4, "method": "getblockcount"}).json()
     assert result["result"] == 9
     assert result["error"] is None
+
+
+
+def test_test_backend_never_broadcasts_or_changes_bitcoin_balances(monkeypatch, tmp_path):
+    """A stale BTC_BROADCAST_ENABLED=1 setting must never permit real BTC writes."""
+    import backend.server as server
+
+    calls = []
+
+    def rpc_spy(settings, method, params):
+        calls.append((method, params))
+        return {"chain": "regtest"}
+
+    monkeypatch.setattr(server, "bitcoin_rpc", rpc_spy)
+    guarded = Settings(
+        db_path=str(tmp_path / "bitcoin-read-only.sqlite3"),
+        app_token="ci-demo-token",
+        demo_mode=True,
+        btc_network="regtest",
+        btc_broadcast_enabled=True,
+    )
+    with TestClient(create_app(guarded)) as api:
+        for method, params, error in [
+            ("sendrawtransaction", ["deadbeef"], -32001),
+            ("sendtoaddress", ["any", 1.0], -32601),
+            ("sendmany", [], -32601),
+            ("settxfee", [0.1], -32601),
+            ("createwallet", ["unsafe"], -32601),
+            ("invalidateblock", ["0" * 64], -32601),
+            ("abandontransaction", ["0" * 64], -32601),
+            ("stop", [], -32601),
+        ]:
+            response = api.post(
+                "/rpc/bitcoin", headers=HEADERS,
+                json={"id": 100, "method": method, "params": params},
+            )
+            assert response.status_code == 200
+            assert response.json()["error"]["code"] == error
+    # Rejected calls must not reach a Bitcoin node, even for network checks.
+    assert calls == []
