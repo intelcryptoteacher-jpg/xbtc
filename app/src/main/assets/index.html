@@ -1,1 +1,194 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;background:#11171d;color:#fff;font:17px Arial}header{padding:22px;background:#1d252d;font-size:25px;color:#e6c56c}nav{display:flex;overflow:auto;background:#202932;gap:6px;padding:12px}button{background:#303c48;color:white;border:0;border-radius:9px;padding:14px;white-space:nowrap;font-size:16px}button.active{background:#d6ae55;color:#151515}section{display:none;padding:18px}section.active{display:block}.card{background:#202932;padding:20px;border-radius:14px;margin:10px 0}h2{color:#e6c56c}input,select,textarea{display:block;box-sizing:border-box;width:100%;padding:13px;margin:10px 0;background:#131a20;border:1px solid #69737e;border-radius:8px;color:#fff;font-size:16px}p{line-height:1.5}.note{color:#e6c56c;font-size:13px;padding:10px 18px}</style></head><body><header>🌍 XBTC Exchange</header><div class="note">DEMO: No live prices, trading, payments, mining or asset verification.</div><nav id="nav"><button class="active">Home</button><button>Exchange</button><button>Assets</button><button>Add Asset</button><button>Wallet</button><button>Miner</button></nav><section class="active"><div class="card"><h2>Welcome to XBTC</h2>Clean and simple asset exchange preview.</div><div class="card"><h2>Gold</h2>Market price pending · EUR per gram<br><p>Physical custody not verified.</p></div></section><section><div class="card"><h2>Exchange</h2>Buy and sell features require a live backend and settlement provider.</div></section><section><div class="card"><h2>My Assets</h2><p>Drafts on this device only. No assets are registered on-chain.</p><div id="myAssets"></div></div></section><section><div class="card"><h2>Add Your Asset</h2><p>Save a private draft for review. Sign-in, uploads and server submission are not connected yet.</p><form id="assetForm"><label>Asset name<input name="name" required maxlength="120" placeholder="Asset name"></label><label>Category<select name="category"><option>Artwork</option><option>Gold</option><option>Silver</option><option>Other</option></select></label><label>Quantity<input name="quantity" type="number" min="0.000001" step="any" required></label><label>Estimated EUR value<input name="value" type="number" min="0" step="0.01" required></label><label>Contact email<input name="email" type="email" required autocomplete="email"></label><label>Description<textarea name="description" maxlength="2000" placeholder="Description"></textarea></label><button type="submit">Save asset draft</button><p id="assetStatus" role="status"></p></form></div></section><section><div class="card"><h2>Wallet</h2>No connected wallet or EUR balance yet.</div></section><section><div class="card"><h2>Miner</h2>Proposed subscription: €1 per TH/s per week.<p>Payments and mining are not active.</p></div></section><script>let buttons=[...document.querySelectorAll('nav button')],pages=[...document.querySelectorAll('section')],pos=0;function show(i){pos=(i+6)%6;buttons.forEach((b,j)=>b.classList.toggle('active',j===pos));pages.forEach((p,j)=>p.classList.toggle('active',j===pos));buttons[pos].scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'})}buttons.forEach((b,i)=>b.onclick=()=>show(i));let x;document.addEventListener('touchstart',e=>x=e.touches[0].clientX);document.addEventListener('touchend',e=>{if(x==null)return;let d=e.changedTouches[0].clientX-x;if(Math.abs(d)>90)show(pos+(d<0?1:-1));x=null})const storageKey='xbtc_asset_drafts_v1';function drafts(){try{return JSON.parse(localStorage.getItem(storageKey)||'[]')}catch(e){return []}}function renderAssets(){const box=document.getElementById('myAssets');box.replaceChildren();const list=drafts();if(!list.length){box.textContent='No asset drafts yet.';return}list.forEach(a=>{const item=document.createElement('div');item.className='card';const title=document.createElement('h3');title.textContent=a.name;const detail=document.createElement('p');detail.textContent=a.category+' · €'+Number(a.value).toFixed(2)+' · Draft (not submitted)';item.append(title,detail);box.append(item)})}document.getElementById('assetForm').addEventListener('submit',e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.currentTarget).entries());if(!e.currentTarget.reportValidity())return;const list=drafts();list.unshift({...data,id:'LOCAL-'+Date.now(),status:'draft'});try{localStorage.setItem(storageKey,JSON.stringify(list));document.getElementById('assetStatus').textContent='Draft saved on this device. Not submitted for approval.';e.currentTarget.reset();renderAssets()}catch(err){document.getElementById('assetStatus').textContent='Unable to save draft on this device.'}});renderAssets();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1320">
+<title>XBTC | Art & Real Assets Exchange</title>
+<style>
+:root {color-scheme:dark;--bg:#0b1320;--panel:#132137;--border:#2a3c53;--text:#f5f7fb;--muted:#a9bad0;--gold:#d4aa59;--accent:#9be0d0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Roboto,sans-serif;font-size:16px}
+header{padding:21px 18px 14px;border-bottom:1px solid var(--border);background:#101c2d}
+.brand{font-size:27px;font-weight:800;letter-spacing:.06em;color:var(--gold)}.sub{font-size:13px;color:var(--muted);margin-top:4px}
+.notice{font-size:13px;line-height:1.5;padding:12px 18px;background:#222339;border-bottom:1px solid #51436a;color:#f6dba9}
+nav{display:flex;overflow-x:auto;gap:7px;padding:12px;background:#101c2d;position:sticky;top:0;z-index:2}
+nav button{font-weight:600;flex-shrink:0;min-width:94px}
+button{color:var(--text);font:inherit;background:#304059;border:1px solid var(--border);padding:12px 15px;border-radius:10px;cursor:pointer;min-height:45px}
+button.active,button.primary{background:var(--gold);color:#101c2d;border-color:var(--gold);font-weight:750}
+button:disabled{opacity:.5;cursor:not-allowed}
+main{max-width:740px;margin:0 auto;padding:15px 17px 42px}
+.page{display:none}.page.active{display:block}
+h1{font-size:25px;margin:9px 0 5px}h2{font-size:19px;margin:4px 0 12px;color:#f3d08d}
+p{line-height:1.55}.muted{color:var(--muted)}.small{font-size:13px}.card{border:1px solid var(--border);border-radius:15px;background:var(--panel);padding:20px;margin:14px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{background:#0f1b2b;padding:14px;border-radius:10px;border:1px solid var(--border)}
+.metric strong{display:block;font-size:24px;color:#e4c585;margin-top:7px}.pill{display:inline-block;font-size:12px;border:1px solid #5b5140;padding:4px 8px;border-radius:999px;color:#e4c585}
+label{font-weight:600;display:block;margin:12px 0 5px;font-size:14px}
+input,select,textarea{background:#0b1524;color:var(--text);border:1px solid #62748b;border-radius:9px;display:block;padding:13px;width:100%;font:inherit;min-height:46px}
+textarea{min-height:90px;resize:vertical}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.actions button{flex:1}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:13px}
+hr{border:0;border-top:1px solid var(--border);margin:16px 0}
+.empty{padding:35px 12px;text-align:center;color:var(--muted);border:1px dashed #55657b;border-radius:12px}
+.status{min-height:20px;margin-top:12px;color:var(--accent);font-size:14px;overflow-wrap:anywhere}
+.warning{color:#f7ce83}.mono{font-family:ui-monospace,monospace;overflow-wrap:anywhere}
+footer{border-top:1px solid var(--border);padding:22px 17px;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:365px){.grid{grid-template-columns:1fr}.card{padding:15px}}
+</style>
+</head>
+<body>
+<header><div class="brand">XBTC</div><div class="sub">Art & Real Assets Exchange · Android preview</div></header>
+<div class="notice" role="status">PRE-LAUNCH · Only genuine, verified assets may appear for sale. No live XBTC mining, EUR payments, auctions or on-chain ownership transfers are enabled.</div>
+<nav aria-label="Main navigation">
+<button type="button" class="active" data-page="market">Marketplace</button>
+<button type="button" data-page="sell">Sell an asset</button>
+<button type="button" data-page="drafts">My assets</button>
+<button type="button" data-page="finance">Fees</button>
+<button type="button" data-page="wallet">XBTC wallet</button>
+</nav>
+<main>
+<section class="page active" id="market">
+<h1>Discover verified assets</h1><p class="muted">Artwork, gold and silver from verified owners. The exchange begins with no inventory.</p>
+<div class="grid"><div class="metric">Publicly approved assets<strong id="approvedCount">0</strong></div><div class="metric">Live auctions<strong>0</strong></div></div>
+<div class="card"><div class="row"><h2>Available assets</h2><span class="pill">Verification required</span></div><div class="empty" id="marketEmpty">No verified artworks, gold or silver are listed yet. Sellers can prepare a private listing for review.</div></div>
+<div class="card"><h2>How auctions will work</h2><p>Once independent ownership, custody and asset documents are checked, a seller can set a reserve in XBTC. The highest valid bid wins after the auction rules and real settlement requirements are satisfied.</p><p class="small muted">An increasing bid changes the offered asset price, not automatically the EUR market value of XBTC.</p><button class="primary" type="button" data-go="sell">Prepare your asset listing</button></div>
+</section>
+<section class="page" id="sell">
+<h1>Sell your own XBTC asset</h1><p class="muted">Prepare a private listing of a real asset you own. Nothing here is advertised, verified, tokenized or submitted to an exchange yet.</p>
+<form id="assetForm" class="card">
+<h2>Asset information</h2>
+<label for="assetName">Asset name</label><input id="assetName" name="name" maxlength="120" required placeholder="Name of your actual asset">
+<label for="assetType">Asset type</label><select id="assetType" name="category" required><option value="Artwork">Artwork / painting</option><option value="Gold">Physical gold</option><option value="Silver">Physical silver</option></select>
+<label for="assetDescription">Description</label><textarea id="assetDescription" name="description" maxlength="2000" required placeholder="Artist, year, materials or metal purity and weight"></textarea>
+<label for="assetRegistry">Owner's inventory / certificate reference</label><input id="assetRegistry" name="reference" maxlength="120" placeholder="Optional existing certificate or serial number">
+<label for="assetXbtc">Proposed auction reserve (XBTC)</label><input id="assetXbtc" name="reserve" type="number" step="0.000000001" min="0.000000001" max="10000000000" required inputmode="decimal" placeholder="Amount in XBTC">
+<label for="ownerDeclaration"><input id="ownerDeclaration" type="checkbox" required style="display:inline;width:auto;min-height:0;margin-right:8px">I confirm this asset exists and I have authority to offer it for sale.</label>
+<button class="primary" type="submit" style="width:100%">Save private listing draft</button>
+<p id="draftResult" class="status" role="status"></p>
+</form>
+<div class="card"><h2>Asset verification</h2><p>Before public listing, the exchange must verify ownership, authenticity, custody or delivery arrangements, and applicable rules. These checks are not available in this offline app build.</p></div>
+</section>
+<section class="page" id="drafts">
+<h1>My asset drafts</h1><p class="muted">Only saved on this device. No draft appears in the public marketplace or can receive bids.</p>
+<div id="draftList" class="empty">No assets entered yet.</div><p id="draftActionStatus" class="status" role="status"></p>
+</section>
+<section class="page" id="finance">
+<h1>Transparent fees</h1><p class="muted">A seller keeps the auction proceeds minus the agreed exchange commission. This calculator is illustrative and does not charge anyone.</p>
+<div class="card"><h2>Seller proceeds calculator</h2>
+<label for="saleAmount">Completed auction amount (XBTC)</label><input id="saleAmount" type="number" step="0.000000001" min="0" inputmode="decimal" value="0">
+<label for="feePercent">Agreed exchange commission (%)</label><input id="feePercent" type="number" step="0.01" min="0" max="100" inputmode="decimal" placeholder="Not agreed yet">
+<div class="metric" style="margin-top:13px"><span class="muted">Seller receives</span><strong id="sellerShare">—</strong></div>
+<div class="metric" style="margin-top:9px"><span class="muted">Exchange earns</span><strong id="exchangeShare">—</strong></div>
+<p id="feeMessage" class="small warning">Enter the agreed fee to calculate. No commission rate has been decided.</p>
+</div>
+<div class="card"><h2>Mining subscriptions</h2><p>Previous pricing proposal: €1 per TH/s for one week. There is no verified hardware, delivered hashrate, paid subscription or mining reward in this app.</p><span class="pill">Not accepting payments</span></div>
+</section>
+<section class="page" id="wallet">
+<h1>XBTC wallet & verification</h1><div class="card"><h2>Wallet connection</h2><p>No real XBTC wallet or on-chain balance is connected in this build.</p><span class="pill">Not connected</span></div>
+<div class="card"><h2>Verify blockchain records</h2><p>Real transactions can be verified once the token mint address, chain, and transaction signature are confirmed. A test ledger balance does not establish token ownership.</p><p class="small muted">Solana devnet tokens are test tokens and have no monetary value.</p></div>
+</section>
+</main>
+<footer>XBTC Marketplace · Private draft preview · No public offering, trading or settlement</footer>
+<script>
+(function () {
+  'use strict';
+  var STORAGE_KEY = 'xbtc_owned_asset_drafts_v2';
+  var pages = Array.from(document.querySelectorAll('section.page'));
+  var tabs = Array.from(document.querySelectorAll('nav button[data-page]'));
+  function openPage(name) {
+    pages.forEach(function (el) { el.classList.toggle('active', el.id === name); });
+    tabs.forEach(function (el) { el.classList.toggle('active', el.dataset.page === name); });
+    window.scrollTo(0, 0);
+    if (name === 'drafts') renderDrafts();
+  }
+  tabs.forEach(function (b) { b.addEventListener('click', function () { openPage(b.dataset.page); }); });
+  document.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click', function () { openPage(b.dataset.go); }); });
+  function drafts() {
+    try {
+      var value = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      return Array.isArray(value) ? value.filter(function (x) { return x && x.id && x.name && x.category; }) : [];
+    } catch (e) { return []; }
+  }
+  function save(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+  function makeId() {
+    if (window.crypto && window.crypto.randomUUID) return 'LOCAL-' + window.crypto.randomUUID();
+    return 'LOCAL-' + Date.now() + '-' + Math.floor(Math.random() * 1000000000);
+  }
+  document.getElementById('assetForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    var form = event.currentTarget;
+    if (!form.reportValidity()) return;
+    var record = {
+      id: makeId(),
+      name: document.getElementById('assetName').value.trim(),
+      category: document.getElementById('assetType').value,
+      description: document.getElementById('assetDescription').value.trim(),
+      reference: document.getElementById('assetRegistry').value.trim(),
+      reserve: document.getElementById('assetXbtc').value,
+      status: 'private_draft_unverified',
+      created: new Date().toISOString()
+    };
+    var result = document.getElementById('draftResult');
+    if (!record.name || !record.description || !['Artwork','Gold','Silver'].includes(record.category)) {
+      result.textContent = 'Enter genuine asset details.'; return;
+    }
+    if (!Number.isFinite(Number(record.reserve)) || Number(record.reserve) <= 0 || Number(record.reserve) > 10000000000) {
+      result.textContent = 'Enter a reserve between zero and ten billion XBTC.'; return;
+    }
+    try {
+      var list = drafts();
+      list.unshift(record);
+      save(list);
+      form.reset();
+      result.textContent = 'Private draft saved on this device. Not submitted or available for purchase.';
+    } catch (e) { result.textContent = 'Could not store this draft. Check available device storage.'; }
+  });
+  function renderDrafts() {
+    var root = document.getElementById('draftList');
+    var list = drafts();
+    root.replaceChildren();
+    root.className = list.length ? '' : 'empty';
+    if (!list.length) { root.textContent = 'No assets entered yet.'; return; }
+    list.forEach(function (asset) {
+      var card = document.createElement('article'); card.className = 'card';
+      var title = document.createElement('h2'); title.textContent = asset.name;
+      var info = document.createElement('p'); info.className = 'muted small';
+      info.textContent = asset.category + ' · Reserve ' + asset.reserve + ' XBTC · Private draft, unverified';
+      var ref = document.createElement('p'); ref.className = 'mono small';
+      ref.textContent = asset.reference ? 'Certificate reference: ' + asset.reference : asset.id;
+      var desc = document.createElement('p'); desc.textContent = asset.description;
+      var remove = document.createElement('button'); remove.type = 'button'; remove.textContent = 'Delete this private draft';
+      remove.addEventListener('click', function () {
+        if (!window.confirm('Remove this private draft from this device?')) return;
+        try {
+          save(drafts().filter(function (x) { return x.id !== asset.id; }));
+          renderDrafts(); document.getElementById('draftActionStatus').textContent = 'Draft deleted.';
+        } catch (e) { document.getElementById('draftActionStatus').textContent = 'Could not delete draft.'; }
+      });
+      card.append(title, info, ref, desc, remove); root.appendChild(card);
+    });
+  }
+  function calculateFees() {
+    var sale = Number(document.getElementById('saleAmount').value);
+    var input = document.getElementById('feePercent');
+    var raw = input.value.trim();
+    var fee = Number(raw);
+    var seller = document.getElementById('sellerShare');
+    var exchange = document.getElementById('exchangeShare');
+    var note = document.getElementById('feeMessage');
+    if (!raw || !Number.isFinite(sale) || sale < 0 || !Number.isFinite(fee) || fee < 0 || fee > 100) {
+      seller.textContent = '—'; exchange.textContent = '—';
+      note.textContent = 'Enter a valid sale amount and an agreed commission rate from 0 to 100%.';
+      return;
+    }
+    var commission = Math.round(sale * fee / 100 * 1e9) / 1e9;
+    seller.textContent = (Math.round((sale - commission) * 1e9) / 1e9).toLocaleString('en-US', {maximumFractionDigits:9}) + ' XBTC';
+    exchange.textContent = commission.toLocaleString('en-US', {maximumFractionDigits:9}) + ' XBTC';
+    note.textContent = 'Illustrative XBTC split only. EUR exchange rates, payment charges and taxes are not included.';
+  }
+  ['saleAmount', 'feePercent'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', calculateFees);
+  });
+  renderDrafts(); calculateFees();
+})();
+</script>
+</body>
+</html>
