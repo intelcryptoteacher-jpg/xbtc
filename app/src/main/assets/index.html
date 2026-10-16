@@ -32,6 +32,7 @@ hr{border:0;border-top:1px solid var(--border);margin:16px 0}
 .warning{color:#f7ce83}.mono{font-family:ui-monospace,monospace;overflow-wrap:anywhere}
 footer{border-top:1px solid var(--border);padding:22px 17px;text-align:center;color:var(--muted);font-size:12px}
 @media(max-width:365px){.grid{grid-template-columns:1fr}.card{padding:15px}}
+.wallet-launch{display:block;padding:17px;border-radius:12px;text-align:center;background:var(--gold);color:#101c2d;font-weight:800;text-decoration:none;margin:14px 0;font-size:18px}
 </style>
 </head>
 <body>
@@ -82,7 +83,7 @@ footer{border-top:1px solid var(--border);padding:22px 17px;text-align:center;co
 <div class="card"><h2>Mining subscriptions</h2><p>Previous pricing proposal: €1 per TH/s for one week. There is no verified hardware, delivered hashrate, paid subscription or mining reward in this app.</p><span class="pill">Not accepting payments</span></div>
 </section>
 <section class="page" id="wallet">
-<h1>XBTC wallet & verification</h1><div class="card"><h2>Wallet connection</h2><p>No real XBTC wallet or on-chain balance is connected in this build.</p><span class="pill">Not connected</span></div>
+<h1>XBTC wallet & verification</h1><div class="card"><h2>Built-in Solana wallet (DEVNET)</h2><p>Use the Android-native secure test wallet to create and keep one address, request free devnet SOL, and approve a 10-billion-XBTC test mint transaction using your Android screen lock.</p><p class="warning small">Development-only: not audited, no recovery backup, no mainnet custody. Never enter a seed phrase into this exchange.</p><a class="wallet-launch" href="xbtc://wallet">Open secure Solana test wallet</a><p class="small muted">A real token is only issued after you approve the signing prompt and the Solana devnet confirms the transaction. This website cannot sign transactions itself.</p></div>
 <div class="card"><h2>Verify blockchain records</h2><p>Real transactions can be verified once the token mint address, chain, and transaction signature are confirmed. A test ledger balance does not establish token ownership.</p><p class="small muted">Solana devnet tokens are test tokens and have no monetary value.</p></div>
 </section>
 </main>
