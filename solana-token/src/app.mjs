@@ -25,7 +25,7 @@ function provider() {
 async function guard() {
   if (!owner || !wallet?.publicKey?.equals(owner)) throw Error('Wallet account changed. Connect again.');
   // The RPC is fixed to devnet; signing cannot redirect submission to mainnet.
-  if (await connection.getGenesisHash() !== 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1') throw Error('Unexpected network. Devnet only.');
+  if (await connection.getGenesisHash() !== 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG') throw Error('Unexpected network. Devnet only.');
 }
 async function action(fn) {
   if (busy) return;
