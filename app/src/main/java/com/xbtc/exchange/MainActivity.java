@@ -11,7 +11,6 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import org.json.JSONObject;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -95,12 +94,10 @@ public class MainActivity extends Activity {
             report("Testing SHA-256 proofs on this phone. No tokens or payments.", 0, "");
             while (running.get() && SystemClock.elapsedRealtime() - began < 30000) {
                 for (int j = 0; j < 250 && running.get(); j++) {
-                    byte[] digest = sha.digest((challenge + "|" + attempts).getBytes(StandardCharsets.UTF_8));
+                    byte[] digest = PhonePow.hash(sha, challenge, attempts);
                     // A local 12-leading-zero-bit target, not any actual chain difficulty.
-                    if (firstProof.isEmpty() && digest[0] == 0 && (digest[1] & 0xf0) == 0) {
-                        StringBuilder hex = new StringBuilder(64);
-                        for (byte b : digest) hex.append(String.format(java.util.Locale.ROOT, "%02x", b & 0xff));
-                        firstProof = "nonce=" + attempts + " sha256=" + hex;
+                    if (firstProof.isEmpty() && PhonePow.isLocalProof(digest)) {
+                        firstProof = "nonce=" + attempts + " sha256=" + PhonePow.hex(digest);
                     }
                     attempts++;
                 }
