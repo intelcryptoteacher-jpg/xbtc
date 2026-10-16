@@ -13,7 +13,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: Set up Java 17
@@ -21,16 +21,30 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
+      - name: Validate project inputs
+        run: |
+          test -s settings.gradle
+          test -s build.gradle
+          test -s app/build.gradle
+          test -s app/src/main/AndroidManifest.xml
+          test -s app/src/main/java/com/xbtc/exchange/MainActivity.java
+          test -s app/src/main/assets/index.html
+          test -s app/src/main/res/drawable/ic_launcher.xml
       - name: Build Android debug APK
-        run: gradle :app:assembleDebug --no-daemon --stacktrace
+        run: gradle :app:assembleDebug --no-daemon --stacktrace --warning-mode all
       - name: Check APK exists
         run: |
           test -s app/build/outputs/apk/debug/app-debug.apk
           ls -lh app/build/outputs/apk/debug/app-debug.apk
+          sha256sum app/build/outputs/apk/debug/app-debug.apk
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
@@ -38,3 +52,12 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
+      - name: Upload build diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: XBTC-build-diagnostics
+          path: |
+            app/build/reports/**
+            app/build/outputs/logs/**
+          if-no-files-found: ignore
