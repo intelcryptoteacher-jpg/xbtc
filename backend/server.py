@@ -21,6 +21,8 @@ from typing import Any
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from pydantic import BaseModel, Field
 
+from backend.solana_api import create_solana_router
+
 
 @dataclass(frozen=True)
 class Settings:
@@ -275,6 +277,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except ValueError as exc:
             return rpc_result(payload, error={"code": -32000, "message": str(exc)})
 
+    api.include_router(create_solana_router(require_token))
     return api
 
 

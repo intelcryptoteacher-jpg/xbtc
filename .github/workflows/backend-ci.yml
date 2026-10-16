@@ -5,10 +5,12 @@ on:
     branches: [master, feature/test-exchange-backend-mvp]
     paths:
       - 'backend/**'
+      - 'solana/**'
       - '.github/workflows/backend-ci.yml'
   pull_request:
     paths:
       - 'backend/**'
+      - 'solana/**'
       - '.github/workflows/backend-ci.yml'
   workflow_dispatch:
 
@@ -29,6 +31,13 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - name: Install dependencies
         run: python -m pip install -r backend/requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Solana operator code syntax
+        run: node --check solana/xbtc.mjs
+      - name: Test Solana token parameters
+        run: node --test solana/config.test.mjs
       - name: Compile Python backend
         run: python -m compileall -q backend
       - name: Run test suite
