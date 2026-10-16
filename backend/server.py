@@ -255,15 +255,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @api.post("/rpc/bitcoin", dependencies=[Depends(require_token)])
     def bridge_rpc(payload: RPCRequest) -> dict:
-        if payload.method not in BTC_READ_METHODS | {"sendrawtransaction"}:
-            return rpc_result(payload, error={"code": -32601, "message": "Method not allowlisted"})
+        # Hard, non-configurable safety boundary: this test backend can never
+        # transmit transactions or change BTC balances, even when an old
+        # configuration mistakenly sets BTC_BROADCAST_ENABLED=1.
         if payload.method == "sendrawtransaction":
-            if not settings.btc_broadcast_enabled:
-                return rpc_result(payload, error={"code": -32001, "message": "Bitcoin broadcasting disabled"})
-            if not payload.params or not isinstance(payload.params[0], str) or (
-                len(payload.params[0]) % 2 != 0 or not HEX.fullmatch(payload.params[0])
-            ):
-                return rpc_result(payload, error={"code": -32602, "message": "Expected raw transaction hex"})
+            return rpc_result(payload, error={"code": -32001,
+                "message": "Bitcoin broadcasting permanently disabled in the test backend"})
+        if payload.method not in BTC_READ_METHODS:
+            return rpc_result(payload, error={"code": -32601, "message": "Read-only method required"})
         try:
             info = bitcoin_rpc(settings, "getblockchaininfo", [])
             if info.get("chain") != settings.btc_network:
