@@ -2,7 +2,13 @@ name: Build XBTC Exchange APK
 on:
   workflow_dispatch:
   push:
-    branches: [master]
+    branches: [master, feature/art-auction-mvp]
+    paths:
+      - 'app/**'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - '.github/workflows/android-apk.yml'
+  pull_request:
     paths:
       - 'app/**'
       - 'build.gradle'
@@ -31,7 +37,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
-      - name: Validate project inputs
+      - name: Set up Node for embedded JavaScript validation
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate app files and asset inventory safeguards
         run: |
           test -s settings.gradle
           test -s build.gradle
@@ -40,6 +50,20 @@ jobs:
           test -s app/src/main/java/com/xbtc/exchange/MainActivity.java
           test -s app/src/main/assets/index.html
           test -s app/src/main/res/drawable/ic_launcher.xml
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("app/src/main/assets/index.html").read_text()
+          match = re.search(r"<script>([\s\S]*?)</script>", html)
+          assert match, "Missing app JavaScript"
+          Path("/tmp/xbtc-app-embedded.js").write_text(match.group(1))
+          assert 'No verified artworks, gold or silver' in html
+          assert 'private_draft_unverified' in html
+          assert "No live XBTC mining" in html
+          assert 'feePercent' in html
+          assert 'data-page="sell"' in html
+          PY
+          node --check /tmp/xbtc-app-embedded.js
       - name: Build Android debug APK
         run: gradle :app:assembleDebug --no-daemon --stacktrace --warning-mode all
       - name: Check APK exists
@@ -50,7 +74,7 @@ jobs:
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: XBTC-Exchange-Android-APK
+          name: XBTC-Art-Exchange-Android-APK
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
